@@ -504,18 +504,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js';
         import {
-            getAuth,
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword,
-            signOut,
-            onAuthStateChanged,
-            updateProfile
-        } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js';
-        import {
             getFirestore,
-            doc,
-            getDoc,
-            setDoc,
             addDoc,
             collection,
             onSnapshot,
@@ -524,13 +513,6 @@
             serverTimestamp,
             limit
         } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
-        import {
-            getStorage,
-            ref,
-            uploadString,
-            getDownloadURL
-        } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js';
-
         const firebaseConfig = {
             apiKey: "AIzaSyASSZv6GpDEQnwbo6O_DIaQF_ZmyU6nGEM",
             authDomain: "chicken-web-8c651.firebaseapp.com",
@@ -542,10 +524,9 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
-        const storage = getStorage(app);
 
+        const ACCOUNT_KEY = 'chicken-chat-local-account';
         const messagesEl = document.getElementById('messages');
         const chatStatus = document.getElementById('chatStatus');
         const messageInput = document.getElementById('messageInput');
@@ -589,10 +570,12 @@
         function setAccount(nextAccount) {
             account = nextAccount;
             if (account) {
+                localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
                 accountPill.classList.remove('hidden');
                 accountAvatar.src = account.avatar || './assets/chat.svg';
                 accountName.textContent = account.username;
             } else {
+                localStorage.removeItem(ACCOUNT_KEY);
                 accountPill.classList.add('hidden');
             }
         }
@@ -656,69 +639,77 @@
             });
         }
 
-        async function loadProfile(user) {
-            const profileRef = doc(db, 'profiles', user.uid);
-            const profileSnap = await getDoc(profileRef);
-            const profileData = profileSnap.exists() ? profileSnap.data() : {};
-            setAccount({
-                id: user.uid,
-                username: profileData.username || user.displayName || user.email || 'chicken user',
-                avatar: profileData.avatar || user.photoURL || './assets/chat.svg'
-            });
+        function loadLocalAccount() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(ACCOUNT_KEY) || 'null');
+                if (saved && saved.username && saved.password) {
+                    setAccount(saved);
+                    return true;
+                }
+            } catch {
+            }
+            return false;
         }
 
-        async function submitAuth() {
+        function submitAuth() {
             authError.textContent = '';
             authStatus.textContent = authMode === 'register' ? 'creating account...' : 'logging in...';
             const username = usernameInput.value.trim();
             const password = passwordInput.value.trim();
-            const email = `${username.toLowerCase().replace(/[^a-z0-9]+/g, '') || 'chickenuser'}@chicken.chat`;
+
+            if (!username || !password) {
+                authError.textContent = 'username and password are required.';
+                authStatus.textContent = 'your login will stay saved on this browser';
+                return;
+            }
+
+            if (authMode === 'register') {
+                const nextAccount = {
+                    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                    username,
+                    password,
+                    avatar: avatarData || './assets/chat.svg'
+                };
+                setAccount(nextAccount);
+                authOverlay.classList.add('hidden');
+                authStatus.textContent = 'your login will stay saved on this browser';
+                watchMessages();
+                chatStatus.textContent = 'live chat connected';
+                return;
+            }
 
             try {
-                if (authMode === 'register') {
-                    const credential = await createUserWithEmailAndPassword(auth, email, password);
-                    let avatarUrl = './assets/chat.svg';
-
-                    if (avatarData) {
-                        const avatarRef = ref(storage, `avatars/${credential.user.uid}.png`);
-                        await uploadString(avatarRef, avatarData, 'data_url');
-                        avatarUrl = await getDownloadURL(avatarRef);
-                    }
-
-                    await updateProfile(credential.user, {
-                        displayName: username,
-                        photoURL: avatarUrl
-                    });
-
-                    await setDoc(doc(db, 'profiles', credential.user.uid), {
-                        username,
-                        avatar: avatarUrl,
-                        createdAt: serverTimestamp()
-                    });
-                } else {
-                    await signInWithEmailAndPassword(auth, email, password);
+                const saved = JSON.parse(localStorage.getItem(ACCOUNT_KEY) || 'null');
+                if (!saved || saved.username !== username || saved.password !== password) {
+                    throw new Error('wrong username or password on this device.');
                 }
+                setAccount(saved);
+                authOverlay.classList.add('hidden');
+                authStatus.textContent = 'your login will stay saved on this browser';
+                watchMessages();
+                chatStatus.textContent = 'live chat connected';
             } catch (error) {
                 authError.textContent = error.message || 'Could not continue.';
                 authStatus.textContent = 'your login will stay saved on this browser';
             }
         }
 
-        async function logout() {
-            await signOut(auth);
+        function logout() {
             setAccount(null);
             authOverlay.classList.remove('hidden');
+            if (unsubscribeMessages) unsubscribeMessages();
+            unsubscribeMessages = null;
+            renderMessages([]);
             chatStatus.textContent = 'log in or make an account';
         }
 
         async function sendMessage() {
             const text = messageInput.value.trim();
-            const user = auth.currentUser;
-            if (!text || !user || !account) return;
+            if (!text || !account) return;
 
             await addDoc(collection(db, 'messages'), {
                 text,
-                userId: user.uid,
+                userId: account.id,
                 username: account.username,
                 avatar: account.avatar || './assets/chat.svg',
                 createdAt: serverTimestamp()
@@ -756,23 +747,16 @@
             }
         });
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                await loadProfile(user);
-                authOverlay.classList.add('hidden');
-                watchMessages();
-                chatStatus.textContent = 'live chat connected';
-            } else {
-                if (unsubscribeMessages) unsubscribeMessages();
-                unsubscribeMessages = null;
-                setAccount(null);
-                renderMessages([]);
-                authOverlay.classList.remove('hidden');
-                chatStatus.textContent = 'log in or make an account';
-            }
-        });
-
         setAuthMode('register');
+        if (loadLocalAccount()) {
+            authOverlay.classList.add('hidden');
+            watchMessages();
+            chatStatus.textContent = 'live chat connected';
+        } else {
+            renderMessages([]);
+            authOverlay.classList.remove('hidden');
+            chatStatus.textContent = 'log in or make an account';
+        }
     </script>
 </body>
 </html>
