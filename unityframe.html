@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="icon" type="image/png" href="png/logo.png"/>
+      <title>chicken • player</title>
+        <meta name="title" content="chicken • player">
+        <meta name="description" content="Launch games and apps inside the chicken frame player.">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://truffled.lol/">
+        <meta property="og:title" content="chicken • player">
+        <meta property="og:description" content="Launch games and apps inside the chicken frame player.">
+        <meta property="og:image" content="https://truffled.lol/png/logo.png">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:url" content="https://truffled.lol/">
+        <meta name="twitter:title" content="chicken • player">
+        <meta name="twitter:description" content="Launch games and apps inside the chicken frame player.">
+        <meta name="twitter:image" content="https://truffled.lol/png/logo.png">
+        <link rel="canonical" href="https://truffled.lol/">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <link rel="stylesheet" href="./css/frame.css">
+   </head>
+   <body class="index-page">
+      </div>
+      <div class="navbar-right">
+          <a href="./index.html" aria-label="Home"><div class="sidebar-icon-asset icon-home"></div></a>
+          <a href="./games.html" aria-label="Games"><div class="sidebar-icon-asset icon-games"></div></a>
+          <a href="./apps.html" aria-label="Apps"><div class="sidebar-icon-asset icon-apps"></div></a>
+          <a href="./tools.html" aria-label="Tools"><div class="sidebar-icon-asset icon-tools"></div></a>
+          <a href="./settings.html" aria-label="Settings"><div class="sidebar-icon-asset icon-settings"></div></a>
+      </div>
+      </div>
+      <div class="content">
+         <div class="iframe-container">
+            <iframe id="gameframe" class="gameframe" src="about:blank"></iframe>
+            <div class="bottom-bar">
+               <div class="iframeiconshere">
+                  <a href="javascript:void(0)" id="fullscreen"><i class="fas fa-expand"></i></a>
+                  <a href="javascript:void(0)" id="iframeicons" onclick="document.getElementById('gameframe').src = document.getElementById('gameframe').src;"><i class="fas fa-sync-alt"></i></a>
+                  <a href="javascript:void(0)" id="copylink"><i class="fas fa-link"></i></a>
+                  <a href="javascript:void(0)" id="aboutblank"><i class="fas fa-external-link-alt"></i></a>
+                  <a href="javascript:void(0)" id="downloadgame"><i class="fas fa-download"></i></a>
+               </div>
+            </div>
+         </div>
+      </div>
+   </body>
+<script>
+document.getElementById('aboutblank').addEventListener('click', function() {
+    const iframe = document.getElementById('gameframe');
+    const currentUrl = iframe.src;
+    
+    if (currentUrl && currentUrl !== 'about:blank') {
+        const win = window.open('about:blank');
+        const doc = win.document;
+        doc.open();
+        doc.write('<iframe src="' + currentUrl + '" style="position:fixed;top:0;left:0;bottom:0;right:0;width:100%;height:100%;border:none;margin:0;padding:0;overflow:hidden;"></iframe>');
+        doc.close();
+        doc.title = 'New Tab';
+    } else {
+        const aboutBlankBtn = document.getElementById('aboutblank');
+        const originalHTML = aboutBlankBtn.innerHTML;
+        aboutBlankBtn.innerHTML = '<i class="fas fa-times"></i>';
+        aboutBlankBtn.style.color = '#FF5722';
+        setTimeout(() => {
+            aboutBlankBtn.innerHTML = originalHTML;
+            aboutBlankBtn.style.color = '';
+        }, 1500);
+    }
+});
+</script>
+<script>
+document.addEventListener("keydown", function(event) {
+    if (event.key === "]") {
+        window.location.href = "./index.html";
+    }
+});
+</script>
+<script>
+function getUrlParameter(name) {
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+    var results = regex.exec(location.href);
+    if (!results) return '';
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+async function loadFrameContent(targetUrl) {
+    const iframe = document.getElementById('gameframe');
+    if (!targetUrl) {
+        iframe.src = 'about:blank';
+        return;
+    }
+
+    const isHtmlDocument =
+        /^https?:\/\//i.test(targetUrl) &&
+        (/\.html?([?#]|$)/i.test(targetUrl) || targetUrl.includes('cdn.jsdelivr.net/gh/gnmathcopy/html@'));
+
+    if (!isHtmlDocument) {
+        iframe.src = targetUrl;
+        return;
+    }
+
+    try {
+        const response = await fetch(targetUrl + (targetUrl.includes('?') ? '&' : '?') + 't=' + Date.now());
+        let html = await response.text();
+        const baseHref = targetUrl.slice(0, targetUrl.lastIndexOf('/') + 1);
+        if (!/<base\s/i.test(html)) {
+            html = html.replace(/<head([^>]*)>/i, `<head$1><base href="${baseHref}">`);
+        }
+        iframe.removeAttribute('src');
+        iframe.contentDocument.open();
+        iframe.contentDocument.write(html);
+        iframe.contentDocument.close();
+    } catch (error) {
+        iframe.src = targetUrl;
+    }
+}
+
+var url = getUrlParameter('url');
+if (url) {
+    loadFrameContent(url);
+}
+</script>
+<script>
+document.getElementById('fullscreen').addEventListener('click', function () {
+    var iframe = document.getElementById('gameframe');
+    if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+    } else if (iframe.mozRequestFullScreen) {
+        iframe.mozRequestFullScreen();
+    } else if (iframe.webkitRequestFullscreen) {
+        iframe.webkitRequestFullscreen();
+    } else if (iframe.msRequestFullscreen) {
+        iframe.msRequestFullscreen();
+    }
+});
+</script>
+<script>
+document.getElementById('copylink').addEventListener('click', function() {
+    const copyBtn = document.getElementById('copylink');
+    const originalHTML = copyBtn.innerHTML;
+    const iframe = document.getElementById('gameframe');
+    const currentUrl = iframe.src;
+    if (currentUrl && currentUrl !== 'about:blank') {
+        const fullUrl = window.location.origin + window.location.pathname + '?url=' + encodeURIComponent(currentUrl);
+        navigator.clipboard.writeText(fullUrl).then(() => {
+            copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+            copyBtn.classList.add('copied');
+            setTimeout(() => {
+                copyBtn.innerHTML = originalHTML;
+                copyBtn.classList.remove('copied');
+            }, 2000);
+        }).catch(() => {
+            const textArea = document.createElement('textarea');
+            textArea.value = fullUrl;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+            copyBtn.classList.add('copied');
+            setTimeout(() => {
+                copyBtn.innerHTML = originalHTML;
+                copyBtn.classList.remove('copied');
+            }, 2000);
+        });
+    } else {
+        copyBtn.innerHTML = '<i class="fas fa-times"></i>';
+        copyBtn.style.color = '#FF5722';
+        setTimeout(() => {
+            copyBtn.innerHTML = originalHTML;
+            copyBtn.style.color = '';
+        }, 1500);
+    }
+});
+</script>
+</html>
+<script>
+   window.onload = function () {
+   	alert("This is a Unity game, It may load slowly depending on your device.");
+   };
+</script>

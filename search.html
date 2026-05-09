@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chicken • browser</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #181818;
+            --panel: rgba(32, 32, 32, 0.68);
+            --grid: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #ffffff;
+            --muted: rgba(255, 255, 255, 0.58);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            cursor: url('./assets/comic.cur'), auto;
+        }
+
+        a, button, input, select {
+            cursor: url('./assets/comic.cur'), pointer;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+
+        .sidebar {
+            position: fixed;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 82px;
+            background: var(--panel);
+            backdrop-filter: blur(24px);
+            border-radius: 20px;
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+            z-index: 20;
+        }
+
+        .sidebar-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .sidebar-icon-asset {
+            width: 34px;
+            height: 34px;
+            display: block;
+            flex: 0 0 auto;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), filter 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .icon-home { background-image: url('./assets/home.png'); }
+        .icon-games { background-image: url('./assets/games.png'); width: 38px; }
+        .icon-apps { background-image: url('./assets/apps.png'); }
+        .icon-tools { background-image: url('./assets/tools.png'); }
+        .icon-settings { background-image: url('./assets/settings.png'); }
+
+        .sidebar-icon:hover .sidebar-icon-asset,
+        .sidebar-icon:focus-visible .sidebar-icon-asset {
+            transform: scale(1.12);
+            filter: brightness(0.72);
+        }
+
+        .browser-shell {
+            height: 100%;
+            padding: 22px 118px 22px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .browser-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 24px;
+            background: var(--panel);
+            backdrop-filter: blur(24px);
+        }
+
+        .browser-btn {
+            width: 42px;
+            height: 42px;
+            border: none;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.25s ease, background 0.25s ease;
+        }
+
+        .browser-btn:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .address-form {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .address-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            border-radius: 16px;
+            padding: 14px 18px;
+            font: inherit;
+            font-size: 15px;
+        }
+
+        .address-input::placeholder {
+            color: rgba(255, 255, 255, 0.48);
+        }
+
+        .browser-frame-wrap {
+            position: relative;
+            flex: 1;
+            min-height: 0;
+            border-radius: 24px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+        }
+
+        .browser-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #101010;
+        }
+
+        .browser-empty {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 32px;
+            color: var(--muted);
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .status-line {
+            color: var(--muted);
+            font-size: 13px;
+            padding-left: 8px;
+        }
+
+        @media (max-width: 760px) {
+            .sidebar {
+                right: 12px;
+                width: 72px;
+            }
+
+            .browser-shell {
+                padding: 14px 88px 14px 14px;
+            }
+
+            .browser-bar {
+                flex-wrap: wrap;
+            }
+
+            .address-form {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a class="sidebar-icon" href="./index.html" aria-label="Home"><div class="sidebar-icon-asset icon-home"></div></a>
+        <a class="sidebar-icon" href="./games.html" aria-label="Games"><div class="sidebar-icon-asset icon-games"></div></a>
+        <a class="sidebar-icon" href="./apps.html" aria-label="Apps"><div class="sidebar-icon-asset icon-apps"></div></a>
+        <a class="sidebar-icon" href="./tools.html" aria-label="Tools"><div class="sidebar-icon-asset icon-tools"></div></a>
+        <a class="sidebar-icon" href="./settings.html" aria-label="Settings"><div class="sidebar-icon-asset icon-settings"></div></a>
+    </div>
+
+    <main class="browser-shell">
+        <div class="browser-bar">
+            <button class="browser-btn" id="backButton" type="button" title="Back">&#8592;</button>
+            <button class="browser-btn" id="forwardButton" type="button" title="Forward">&#8594;</button>
+            <button class="browser-btn" id="reloadButton" type="button" title="Reload">&#8635;</button>
+            <button class="browser-btn" id="homeButton" type="button" title="Home">&#8962;</button>
+            <form class="address-form" id="addressForm">
+                <input class="address-input" id="addressInput" type="text" placeholder="Search anything or enter a URL" autocomplete="off">
+            </form>
+            <button class="browser-btn" id="openTabButton" type="button" title="Open in tab">&#8599;</button>
+        </div>
+        <div class="status-line" id="statusLine">chicken browser</div>
+        <div class="browser-frame-wrap">
+            <iframe class="browser-frame" id="browserFrame" referrerpolicy="no-referrer"></iframe>
+            <div class="browser-empty" id="emptyState">Search the web or open a URL through UV.</div>
+        </div>
+    </main>
+
+    <script src="./baremux/index.js"></script>
+    <script src="./uv/uv.bundle.js"></script>
+    <script src="./uv/uv.config.js"></script>
+    <script src="./register-sw.js"></script>
+    <script src="./js/search.js"></script>
+    <script>
+        const addressForm = document.getElementById('addressForm');
+        const addressInput = document.getElementById('addressInput');
+        const browserFrame = document.getElementById('browserFrame');
+        const emptyState = document.getElementById('emptyState');
+        const statusLine = document.getElementById('statusLine');
+        const hasUv =
+            typeof window.BareMux !== 'undefined' &&
+            typeof window.__uv$config !== 'undefined' &&
+            typeof window.registerSW === 'function';
+        const connection = hasUv ? new BareMux.BareMuxConnection('/baremux/worker.js') : null;
+        const historyStack = [];
+        let historyIndex = -1;
+
+        function getInitialUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('url') || '';
+        }
+
+        function setFrame(url, push = true) {
+            if (!url) return;
+            browserFrame.src = url;
+            emptyState.style.display = 'none';
+            addressInput.value = url;
+            statusLine.textContent = url;
+
+            if (push) {
+                historyStack.splice(historyIndex + 1);
+                historyStack.push(url);
+                historyIndex = historyStack.length - 1;
+            }
+        }
+
+        function looksLikeSearch(value) {
+            try {
+                new URL(value);
+                return false;
+            } catch (error) {
+            }
+
+            try {
+                const url = new URL(`http://${value}`);
+                return !url.hostname.includes('.');
+            } catch (error) {
+                return true;
+            }
+        }
+
+        async function navigate(raw) {
+            const value = raw.trim();
+            if (!value) return;
+
+            const target = search(value, 'https://duckduckgo.com/?q=%s');
+
+            if (!hasUv) {
+                if (looksLikeSearch(value)) {
+                    statusLine.textContent = 'direct mode: opening search in a new tab';
+                    window.open(target, '_blank', 'noopener');
+                    addressInput.value = value;
+                    emptyState.style.display = 'flex';
+                } else {
+                    statusLine.textContent = 'direct mode: proxy backend not running';
+                    setFrame(target, true);
+                }
+                return;
+            }
+
+            try {
+                await registerSW();
+                const wispUrl =
+                    (location.protocol === 'https:' ? 'wss' : 'ws') +
+                    '://' +
+                    location.host +
+                    '/wisp/';
+
+                if ((await connection.getTransport()) !== '/epoxy/index.mjs') {
+                    await connection.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl }]);
+                }
+
+                setFrame(__uv$config.prefix + __uv$config.encodeUrl(target), true);
+                statusLine.textContent = 'proxy mode active';
+            } catch (error) {
+                statusLine.textContent = 'proxy failed, using direct mode';
+                setFrame(target, true);
+            }
+        }
+
+        addressForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            await navigate(addressInput.value);
+        });
+
+        document.getElementById('backButton').addEventListener('click', () => {
+            if (historyIndex > 0) {
+                historyIndex -= 1;
+                setFrame(historyStack[historyIndex], false);
+            }
+        });
+
+        document.getElementById('forwardButton').addEventListener('click', () => {
+            if (historyIndex < historyStack.length - 1) {
+                historyIndex += 1;
+                setFrame(historyStack[historyIndex], false);
+            }
+        });
+
+        document.getElementById('reloadButton').addEventListener('click', () => {
+            if (browserFrame.src) {
+                browserFrame.src = browserFrame.src;
+            }
+        });
+
+        document.getElementById('homeButton').addEventListener('click', () => {
+            window.location.href = './index.html';
+        });
+
+        document.getElementById('openTabButton').addEventListener('click', () => {
+            if (browserFrame.src) {
+                window.open(browserFrame.src, '_blank', 'noopener');
+            }
+        });
+
+        const initial = getInitialUrl();
+        if (hasUv) {
+            statusLine.textContent = 'proxy mode ready';
+        } else {
+            statusLine.textContent = 'direct mode: start the UV server for proxy';
+        }
+
+        if (initial) {
+            navigate(initial);
+        }
+    </script>
+</body>
+</html>

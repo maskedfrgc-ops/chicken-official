@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chicken • unblocked</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #ffffff;
+            --orange-light: #d9d9d9;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #181818;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            cursor: url('./assets/comic.cur'), auto;
+        }
+        a, button, input, select { cursor: url('./assets/comic.cur'), pointer; }
+        
+        /* Blueprint Background */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -2;
+        }
+        
+        .background::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: -1;
+        }
+        
+        /* Floating Sidebar - Right Side */
+        .sidebar {
+            position: fixed;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 82px;
+            background: rgba(32, 32, 32, 0.68);
+            backdrop-filter: blur(24px);
+            border: none;
+            border-radius: 20px;
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+            z-index: 100;
+        }
+        
+        .sidebar-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ddd;
+            border-radius: 16px;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-icon-asset {
+            width: 34px;
+            height: 34px;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), filter 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .icon-games {
+            width: 38px;
+        }
+
+        .icon-home {
+            background-image: url('./assets/home.png');
+        }
+
+        .icon-games {
+            background-image: url('./assets/games.png');
+        }
+
+        .icon-apps {
+            background-image: url('./assets/apps.png');
+        }
+
+        .icon-tools {
+            background-image: url('./assets/tools.png');
+        }
+
+        .icon-settings {
+            background-image: url('./assets/settings.png');
+        }
+        
+        .sidebar-icon:hover {
+            background: transparent;
+            color: white;
+        }
+        
+        .sidebar-icon.active {
+            background: transparent;
+            color: white;
+        }
+
+        .sidebar-icon:hover .sidebar-icon-asset,
+        .sidebar-icon:focus-visible .sidebar-icon-asset {
+            transform: scale(1.12);
+            filter: brightness(0.72);
+        }
+        
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 64px 112px 64px 64px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .title {
+            font-size: 128px;
+            font-weight: 700;
+            letter-spacing: -7px;
+            color: white;
+            margin-bottom: 16px;
+        }
+        
+        .rotating-container {
+            text-align: center;
+            margin-bottom: 48px;
+            width: min(780px, 100%);
+            display: flex;
+            justify-content: center;
+        }
+        
+        .rotating-text {
+            position: relative;
+            height: 42px;
+            width: min(780px, 100%);
+            overflow: hidden;
+        }
+        
+        .rotating-text span {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            font-size: 26px;
+            font-weight: 500;
+            color: var(--orange-light);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 12px;
+        }
+        
+        .rotating-text span.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .search-launcher {
+            width: min(780px, 100%);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 24px;
+            background: rgba(32, 32, 32, 0.68);
+            backdrop-filter: blur(24px);
+        }
+
+        .search-launcher input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            border-radius: 18px;
+            padding: 18px 20px;
+            font: inherit;
+            font-size: 16px;
+        }
+
+        .search-launcher input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-launcher button {
+            border: none;
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 18px;
+            padding: 18px 24px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.25s ease, background 0.25s ease;
+        }
+
+        .search-launcher button:hover {
+            background: rgba(255, 255, 255, 0.16);
+            transform: scale(1.03);
+        }
+
+        @media (max-width: 900px) {
+            .main {
+                padding: 48px 108px 48px 24px;
+            }
+
+            .title {
+                font-size: 88px;
+            }
+
+        }
+
+        @media (max-width: 700px) {
+            body {
+                overflow: auto;
+            }
+
+            .sidebar {
+                right: 12px;
+                width: 72px;
+            }
+
+            .main {
+                justify-content: flex-start;
+                padding: 40px 96px 40px 20px;
+            }
+
+            .title {
+                font-size: 64px;
+                letter-spacing: -3px;
+                text-align: center;
+            }
+
+            .rotating-text {
+                height: 56px;
+            }
+
+            .rotating-text span {
+                font-size: 20px;
+            }
+
+            .search-launcher {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <!-- Floating Right Sidebar with SVG Icons -->
+    <div class="sidebar">
+        <a class="sidebar-icon active" href="./index.html" aria-label="Home">
+            <div class="sidebar-icon-asset icon-home"></div>
+        </a>
+
+        <a class="sidebar-icon" href="./games.html" aria-label="Games">
+            <div class="sidebar-icon-asset icon-games"></div>
+        </a>
+        
+        <a class="sidebar-icon" href="./apps.html" aria-label="Apps">
+            <div class="sidebar-icon-asset icon-apps"></div>
+        </a>
+        
+        <a class="sidebar-icon" href="./tools.html" aria-label="Tools">
+            <div class="sidebar-icon-asset icon-tools"></div>
+        </a>
+        
+        <a class="sidebar-icon" href="./settings.html" aria-label="Settings">
+            <div class="sidebar-icon-asset icon-settings"></div>
+        </a>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main">
+        <h1 class="title">chicken</h1>
+        
+        <div class="rotating-container">
+            <div class="rotating-text" id="rotatingText"></div>
+        </div>
+
+        <form class="search-launcher" id="browserLaunchForm">
+            <input id="browserLaunchInput" type="text" placeholder="Search the web or enter a URL">
+            <button type="submit">open</button>
+        </form>
+
+    </div>
+
+    <script src="./js/search.js"></script>
+    <script>
+        const messages = [
+            "mogged",
+            "larpchicken",
+            "arcady is pretty cool",
+            "uh.. ooze is pretty RADICAL...",
+            "who doesnt like chicken?",
+            "canes unblocked OG"
+        ];
+        
+        let currentIndex = 0;
+        const container = document.getElementById('rotatingText');
+        
+        messages.forEach((msg, i) => {
+            const span = document.createElement('span');
+            span.textContent = msg;
+            if (i === 0) span.classList.add('active');
+            container.appendChild(span);
+        });
+        
+        function rotateText() {
+            const spans = container.querySelectorAll('span');
+            spans[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex + 1) % messages.length;
+            spans[currentIndex].classList.add('active');
+        }
+        
+        setInterval(rotateText, 3200);
+
+        const browserLaunchForm = document.getElementById('browserLaunchForm');
+        const browserLaunchInput = document.getElementById('browserLaunchInput');
+
+        browserLaunchForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const raw = browserLaunchInput.value.trim();
+            if (!raw) return;
+            const target = search(raw, 'https://duckduckgo.com/?q=%s');
+            window.location.href = `./search.html?url=${encodeURIComponent(target)}`;
+        });
+    </script>
+</body>
+</html>

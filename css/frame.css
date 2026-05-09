@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+:root {
+    --bg: #181818;
+    --panel: rgba(32, 32, 32, 0.68);
+    --panel-solid: #202020;
+    --panel-dark: #161616;
+    --grid: rgba(255, 255, 255, 0.04);
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #ffffff;
+    --muted: rgba(255, 255, 255, 0.68);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    position: relative;
+    cursor: url('../assets/comic.cur'), auto;
+}
+
+a,
+button,
+input,
+select {
+    cursor: url('../assets/comic.cur'), pointer;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: -1;
+}
+
+.navbar-right {
+    position: fixed;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
+    width: 82px;
+    background: var(--panel);
+    backdrop-filter: blur(24px);
+    border-radius: 20px;
+    padding: 24px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    z-index: 60;
+}
+
+.navbar-right a {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.navbar-right img,
+.navbar-right .sidebar-icon-asset {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), filter 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar-right img {
+    filter: brightness(0) invert(1);
+}
+
+.navbar-right .sidebar-icon-asset {
+    display: block;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    flex: 0 0 auto;
+}
+
+.icon-home { background-image: url('../assets/home.png'); }
+.icon-games { background-image: url('../assets/games.png'); width: 38px; }
+.icon-apps { background-image: url('../assets/apps.png'); }
+.icon-tools { background-image: url('../assets/tools.png'); }
+.icon-settings { background-image: url('../assets/settings.png'); }
+
+.navbar-right a:hover img,
+.navbar-right a:focus-visible img,
+.navbar-right a:hover .sidebar-icon-asset,
+.navbar-right a:focus-visible .sidebar-icon-asset {
+    transform: scale(1.12);
+}
+
+.navbar-right a:hover img,
+.navbar-right a:focus-visible img {
+    filter: brightness(0.72) invert(1);
+}
+
+.navbar-right a:hover .sidebar-icon-asset,
+.navbar-right a:focus-visible .sidebar-icon-asset {
+    filter: brightness(0.72);
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+    padding: 32px 122px 32px 32px;
+}
+
+.iframe-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 22px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+}
+
+.gameframe {
+    width: 100%;
+    height: calc(100% - 68px);
+    border: none;
+    display: block;
+    background: #111111;
+}
+
+.bottom-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 68px;
+    background: rgba(24, 24, 24, 0.92);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 16px;
+}
+
+.iframeiconshere {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#iframeicons,
+#fullscreen,
+#copylink,
+#downloadgame,
+#aboutblank,
+#discordchat {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: white;
+    background: rgba(255, 255, 255, 0.08);
+    transition: background 0.25s ease, transform 0.25s ease, filter 0.25s ease;
+}
+
+#iframeicons:hover,
+#fullscreen:hover,
+#copylink:hover,
+#downloadgame:hover,
+#aboutblank:hover,
+#discordchat:hover {
+    background: rgba(255, 255, 255, 0.14);
+    transform: scale(1.05);
+}
+
+#copylink.copied {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+@media (max-width: 900px) {
+    .content {
+        padding: 20px 104px 20px 20px;
+    }
+}
+
+@media (max-width: 700px) {
+    .navbar-right {
+        right: 12px;
+        width: 72px;
+    }
+
+    .content {
+        padding: 12px 88px 12px 12px;
+    }
+
+    .iframe-container {
+        border-radius: 18px;
+    }
+
+    .bottom-bar {
+        height: 60px;
+        padding: 0 10px;
+    }
+
+    .gameframe {
+        height: calc(100% - 60px);
+    }
+
+    #iframeicons,
+    #fullscreen,
+    #copylink,
+    #downloadgame,
+    #aboutblank,
+    #discordchat {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+    }
+}
