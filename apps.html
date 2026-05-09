@@ -14,7 +14,7 @@
         .sidebar { position: fixed; right: 24px; top: 50%; transform: translateY(-50%); width: 82px; background: var(--panel); backdrop-filter: blur(24px); border-radius: 20px; padding: 24px 0; display: flex; flex-direction: column; align-items: center; gap: 28px; z-index: 10; }
         .sidebar-icon { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
         .sidebar-icon-asset { width: 34px; height: 34px; display: block; flex: 0 0 auto; background-position: center; background-repeat: no-repeat; background-size: contain; transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), filter 0.35s cubic-bezier(0.4,0,0.2,1); }
-        .icon-home { background-image: url('./assets/home.png'); } .icon-games { background-image: url('./assets/games.png'); width: 38px; } .icon-apps { background-image: url('./assets/apps.png'); } .icon-tools { background-image: url('./assets/tools.png'); } .icon-settings { background-image: url('./assets/settings.png'); }
+        .icon-home { background-image: url('./assets/home.png'); } .icon-games { background-image: url('./assets/games.png'); width: 38px; } .icon-apps { background-image: url('./assets/apps.png'); } .icon-chat { background-image: url('./assets/chat.svg'); } .icon-settings { background-image: url('./assets/settings.png'); }
         .sidebar-icon:hover .sidebar-icon-asset, .sidebar-icon:focus-visible .sidebar-icon-asset { transform: scale(1.12); filter: brightness(0.72); }
         .page { padding: 56px 118px 56px 40px; }
         .page h1 { font-size: 56px; font-weight: 700; letter-spacing: -2px; margin-bottom: 10px; }
@@ -46,7 +46,7 @@
         <a class="sidebar-icon" href="./index.html" aria-label="Home"><div class="sidebar-icon-asset icon-home"></div></a>
         <a class="sidebar-icon" href="./games.html" aria-label="Games"><div class="sidebar-icon-asset icon-games"></div></a>
         <a class="sidebar-icon" href="./apps.html" aria-label="Apps"><div class="sidebar-icon-asset icon-apps"></div></a>
-        <a class="sidebar-icon" href="./tools.html" aria-label="Tools"><div class="sidebar-icon-asset icon-tools"></div></a>
+        <a class="sidebar-icon" href="./tools.html" aria-label="Chat"><div class="sidebar-icon-asset icon-chat"></div></a>
         <a class="sidebar-icon" href="./settings.html" aria-label="Settings"><div class="sidebar-icon-asset icon-settings"></div></a>
     </div>
     <main class="page">
