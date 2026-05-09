@@ -11,7 +11,6 @@
             --bg: #181818;
             --panel: rgba(32, 32, 32, 0.68);
             --grid: rgba(255,255,255,0.04);
-            --card: rgba(255,255,255,0.06);
             --border: rgba(255,255,255,0.08);
             --text: #fff;
             --muted: rgba(255,255,255,0.68);
@@ -81,7 +80,7 @@
         .icon-home { background-image: url('./assets/home.png'); }
         .icon-games { background-image: url('./assets/games.png'); width: 38px; }
         .icon-apps { background-image: url('./assets/apps.png'); }
-        .icon-chat { background-image: url('./assets/chat.svg'); width: 38px; }
+        .icon-chat { background-image: url('./assets/chat.svg'); width: 46px; height: 46px; }
         .icon-settings { background-image: url('./assets/settings.png'); }
 
         .sidebar-icon:hover .sidebar-icon-asset,
@@ -149,13 +148,31 @@
             font-size: 13px;
         }
 
-        .logout-btn {
+        .logout-btn,
+        .primary-btn,
+        .secondary-btn,
+        .mode-switch button {
             border: 1px solid var(--border);
-            background: rgba(255,255,255,0.08);
             color: white;
-            border-radius: 14px;
-            padding: 10px 14px;
             font: inherit;
+        }
+
+        .logout-btn,
+        .primary-btn,
+        .secondary-btn {
+            border-radius: 16px;
+            padding: 12px 16px;
+        }
+
+        .logout-btn,
+        .secondary-btn,
+        .mode-switch button {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .primary-btn,
+        .mode-switch button.active {
+            background: rgba(255,255,255,0.12);
         }
 
         .chat-shell {
@@ -277,6 +294,38 @@
             resize: vertical;
         }
 
+        .file-picker {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.06);
+            color: white;
+            border-radius: 18px;
+            padding: 12px 14px;
+        }
+
+        .file-picker label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.08);
+            white-space: nowrap;
+        }
+
+        .file-picker-name {
+            min-width: 0;
+            color: var(--muted);
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .composer-actions,
         .auth-actions {
             display: flex;
@@ -284,23 +333,6 @@
             align-items: center;
             gap: 12px;
             flex-wrap: wrap;
-        }
-
-        .primary-btn,
-        .secondary-btn {
-            border: 1px solid var(--border);
-            color: white;
-            border-radius: 16px;
-            padding: 12px 16px;
-            font: inherit;
-        }
-
-        .primary-btn {
-            background: rgba(255,255,255,0.12);
-        }
-
-        .secondary-btn {
-            background: rgba(255,255,255,0.05);
         }
 
         .status {
@@ -358,16 +390,8 @@
 
         .mode-switch button {
             flex: 1;
-            border: 1px solid var(--border);
             border-radius: 14px;
             padding: 12px 14px;
-            background: rgba(255,255,255,0.05);
-            color: white;
-            font: inherit;
-        }
-
-        .mode-switch button.active {
-            background: rgba(255,255,255,0.12);
         }
 
         .auth-error {
@@ -422,7 +446,7 @@
                 <img class="avatar" id="accountAvatar" alt="">
                 <div class="account-meta">
                     <div class="account-name" id="accountName"></div>
-                    <div class="account-sub">saved on this device</div>
+                    <div class="account-sub">saved through firebase</div>
                 </div>
                 <button class="logout-btn" id="logoutButton" type="button">log out</button>
             </div>
@@ -431,11 +455,11 @@
         <div class="chat-shell">
             <aside class="panel sidebar-panel">
                 <h2>jump in</h2>
-                <p>Create an account once, then your login stays saved on this device so you can come back and keep chatting.</p>
+                <p>Create an account once, then Firebase keeps your login and live messages synced when you come back.</p>
                 <div class="tips">
-                    <div class="tip-card">Pick a username, upload a profile picture, and you’re in.</div>
+                    <div class="tip-card">Pick a username, upload a profile picture, and you're in.</div>
                     <div class="tip-card">Messages update live for everyone in the room.</div>
-                    <div class="tip-card">If Railway redeploys, old chat history may reset unless you add persistent storage later.</div>
+                    <div class="tip-card">Your chat history is saved publicly through Firebase instead of resetting on deploy.</div>
                 </div>
             </aside>
 
@@ -463,7 +487,11 @@
             <div class="auth-form">
                 <input id="usernameInput" type="text" placeholder="username">
                 <input id="passwordInput" type="password" placeholder="password">
-                <input id="avatarInput" type="file" accept="image/*">
+                <div class="file-picker" id="avatarPickerWrap">
+                    <label for="avatarInput">choose image</label>
+                    <span class="file-picker-name" id="avatarFileName">no file chosen</span>
+                    <input id="avatarInput" class="hidden" type="file" accept="image/*">
+                </div>
                 <div class="auth-error" id="authError"></div>
                 <div class="auth-actions">
                     <div class="status" id="authStatus">your login will stay saved on this browser</div>
@@ -473,9 +501,50 @@
         </div>
     </div>
 
-    <script>
-        const AUTH_TOKEN_KEY = 'chicken-chat-token';
-        const ACCOUNT_KEY = 'chicken-chat-account';
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js';
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged,
+            updateProfile
+        } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js';
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
+            addDoc,
+            collection,
+            onSnapshot,
+            orderBy,
+            query,
+            serverTimestamp,
+            limit
+        } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
+        import {
+            getStorage,
+            ref,
+            uploadString,
+            getDownloadURL
+        } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyASSZv6GpDEQnwbo6O_DIaQF_ZmyU6nGEM",
+            authDomain: "chicken-web-8c651.firebaseapp.com",
+            projectId: "chicken-web-8c651",
+            storageBucket: "chicken-web-8c651.firebasestorage.app",
+            messagingSenderId: "674248679241",
+            appId: "1:674248679241:web:62b44ef3f818fef9900498",
+            measurementId: "G-FL0NXTEXXC"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
 
         const messagesEl = document.getElementById('messages');
         const chatStatus = document.getElementById('chatStatus');
@@ -491,16 +560,17 @@
         const usernameInput = document.getElementById('usernameInput');
         const passwordInput = document.getElementById('passwordInput');
         const avatarInput = document.getElementById('avatarInput');
+        const avatarPickerWrap = document.getElementById('avatarPickerWrap');
+        const avatarFileName = document.getElementById('avatarFileName');
         const accountPill = document.getElementById('accountPill');
         const accountAvatar = document.getElementById('accountAvatar');
         const accountName = document.getElementById('accountName');
         const logoutButton = document.getElementById('logoutButton');
 
         let authMode = 'register';
-        let authToken = localStorage.getItem(AUTH_TOKEN_KEY) || '';
         let account = null;
-        let socket = null;
         let avatarData = '';
+        let unsubscribeMessages = null;
 
         function escapeHtml(value) {
             return String(value)
@@ -512,19 +582,17 @@
         }
 
         function formatTime(value) {
-            const date = new Date(value);
+            const date = value ? new Date(value) : new Date();
             return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
         }
 
         function setAccount(nextAccount) {
             account = nextAccount;
             if (account) {
-                localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
                 accountPill.classList.remove('hidden');
                 accountAvatar.src = account.avatar || './assets/chat.svg';
                 accountName.textContent = account.username;
             } else {
-                localStorage.removeItem(ACCOUNT_KEY);
                 accountPill.classList.add('hidden');
             }
         }
@@ -538,7 +606,8 @@
             authSubtitle.textContent = register
                 ? 'Create your chat account to join the room.'
                 : 'Log into your saved chicken chat account.';
-            avatarInput.classList.toggle('hidden', !register);
+            usernameInput.classList.toggle('hidden', !register);
+            avatarPickerWrap.classList.toggle('hidden', !register);
             authError.textContent = '';
         }
 
@@ -568,108 +637,93 @@
             messages.forEach(addMessage);
         }
 
-        async function bootstrap() {
-            const response = await fetch(`/api/chat/bootstrap?token=${encodeURIComponent(authToken)}`);
-            const data = await response.json();
-            renderMessages(data.messages || []);
-            if (data.account) {
-                setAccount(data.account);
-                authOverlay.classList.add('hidden');
-                connectSocket();
-            } else {
-                setAccount(null);
-                authOverlay.classList.remove('hidden');
-                chatStatus.textContent = 'log in or make an account';
-            }
-        }
-
-        function connectSocket() {
-            if (!authToken) return;
-            if (socket) socket.close();
-
-            const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-            socket = new WebSocket(`${protocol}//${location.host}/chat-ws?token=${encodeURIComponent(authToken)}`);
-
-            socket.addEventListener('open', () => {
+        function watchMessages() {
+            if (unsubscribeMessages) unsubscribeMessages();
+            const messagesQuery = query(collection(db, 'messages'), orderBy('createdAt', 'asc'), limit(150));
+            unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
+                const messages = snapshot.docs.map((entry) => {
+                    const data = entry.data();
+                    return {
+                        id: entry.id,
+                        text: data.text || '',
+                        createdAt: data.createdAt?.toDate?.()?.toISOString?.() || new Date().toISOString(),
+                        username: data.username || 'unknown',
+                        avatar: data.avatar || './assets/chat.svg'
+                    };
+                });
+                renderMessages(messages);
                 chatStatus.textContent = 'live chat connected';
             });
+        }
 
-            socket.addEventListener('close', () => {
-                chatStatus.textContent = 'chat disconnected';
-            });
-
-            socket.addEventListener('message', (event) => {
-                try {
-                    const payload = JSON.parse(event.data);
-                    if (payload.type === 'message') {
-                        const emptyState = messagesEl.querySelector('.empty-state');
-                        if (emptyState) messagesEl.innerHTML = '';
-                        addMessage(payload.message);
-                    }
-                } catch {
-                }
+        async function loadProfile(user) {
+            const profileRef = doc(db, 'profiles', user.uid);
+            const profileSnap = await getDoc(profileRef);
+            const profileData = profileSnap.exists() ? profileSnap.data() : {};
+            setAccount({
+                id: user.uid,
+                username: profileData.username || user.displayName || user.email || 'chicken user',
+                avatar: profileData.avatar || user.photoURL || './assets/chat.svg'
             });
         }
 
         async function submitAuth() {
             authError.textContent = '';
             authStatus.textContent = authMode === 'register' ? 'creating account...' : 'logging in...';
-
-            const body = {
-                username: usernameInput.value.trim(),
-                password: passwordInput.value.trim(),
-            };
-
-            if (authMode === 'register') {
-                body.avatar = avatarData;
-            }
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            const email = `${username.toLowerCase().replace(/[^a-z0-9]+/g, '') || 'chickenuser'}@chicken.chat`;
 
             try {
-                const response = await fetch(authMode === 'register' ? '/api/chat/register' : '/api/chat/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body),
-                });
+                if (authMode === 'register') {
+                    const credential = await createUserWithEmailAndPassword(auth, email, password);
+                    let avatarUrl = './assets/chat.svg';
 
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error || 'Could not continue.');
+                    if (avatarData) {
+                        const avatarRef = ref(storage, `avatars/${credential.user.uid}.png`);
+                        await uploadString(avatarRef, avatarData, 'data_url');
+                        avatarUrl = await getDownloadURL(avatarRef);
+                    }
+
+                    await updateProfile(credential.user, {
+                        displayName: username,
+                        photoURL: avatarUrl
+                    });
+
+                    await setDoc(doc(db, 'profiles', credential.user.uid), {
+                        username,
+                        avatar: avatarUrl,
+                        createdAt: serverTimestamp()
+                    });
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
                 }
-
-                authToken = data.token;
-                localStorage.setItem(AUTH_TOKEN_KEY, authToken);
-                setAccount(data.account);
-                authOverlay.classList.add('hidden');
-                authStatus.textContent = 'your login will stay saved on this browser';
-                connectSocket();
-                await bootstrap();
             } catch (error) {
-                authError.textContent = error.message;
+                authError.textContent = error.message || 'Could not continue.';
                 authStatus.textContent = 'your login will stay saved on this browser';
             }
         }
 
         async function logout() {
-            if (authToken) {
-                await fetch('/api/chat/logout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: authToken }),
-                }).catch(() => {});
-            }
-
-            authToken = '';
-            localStorage.removeItem(AUTH_TOKEN_KEY);
+            await signOut(auth);
             setAccount(null);
-            if (socket) socket.close();
             authOverlay.classList.remove('hidden');
             chatStatus.textContent = 'log in or make an account';
         }
 
         async function sendMessage() {
             const text = messageInput.value.trim();
-            if (!text || !socket || socket.readyState !== WebSocket.OPEN) return;
-            socket.send(JSON.stringify({ type: 'message', text }));
+            const user = auth.currentUser;
+            if (!text || !user || !account) return;
+
+            await addDoc(collection(db, 'messages'), {
+                text,
+                userId: user.uid,
+                username: account.username,
+                avatar: account.avatar || './assets/chat.svg',
+                createdAt: serverTimestamp()
+            });
+
             messageInput.value = '';
         }
 
@@ -677,8 +731,11 @@
             const file = avatarInput.files && avatarInput.files[0];
             if (!file) {
                 avatarData = '';
+                avatarFileName.textContent = 'no file chosen';
                 return;
             }
+
+            avatarFileName.textContent = file.name;
 
             const reader = new FileReader();
             reader.onload = () => {
@@ -699,10 +756,23 @@
             }
         });
 
-        setAuthMode('register');
-        bootstrap().catch(() => {
-            chatStatus.textContent = 'chat failed to load';
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                await loadProfile(user);
+                authOverlay.classList.add('hidden');
+                watchMessages();
+                chatStatus.textContent = 'live chat connected';
+            } else {
+                if (unsubscribeMessages) unsubscribeMessages();
+                unsubscribeMessages = null;
+                setAccount(null);
+                renderMessages([]);
+                authOverlay.classList.remove('hidden');
+                chatStatus.textContent = 'log in or make an account';
+            }
         });
+
+        setAuthMode('register');
     </script>
 </body>
 </html>
