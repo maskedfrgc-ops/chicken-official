@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chicken • education</title>
+    <link rel="icon" type="image/png" href="./assets/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #181818;
+            --surface: rgba(28, 28, 28, 0.82);
+            --surface-strong: rgba(36, 36, 36, 0.92);
+            --border: rgba(255, 255, 255, 0.08);
+            --grid: rgba(255, 255, 255, 0.04);
+            --text: #ffffff;
+            --muted: rgba(255, 255, 255, 0.72);
+            --soft: rgba(255, 255, 255, 0.54);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: url('./assets/comic.cur'), auto;
+        }
+
+        a, button, input {
+            cursor: url('./assets/comic.cur'), pointer;
+        }
+
+        .background {
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -2;
+        }
+
+        .background::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.05), transparent 26%),
+                radial-gradient(circle at 82% 18%, rgba(255, 255, 255, 0.04), transparent 28%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 30%);
+        }
+
+        .page {
+            width: min(1100px, calc(100% - 28px));
+            margin: 0 auto;
+            padding: 18px 0 70px;
+        }
+
+        .school-nav {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 18px;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            color: var(--text);
+        }
+
+        .hero-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            backdrop-filter: blur(24px);
+            padding: 42px 38px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 18px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-section h1 {
+            font-size: clamp(50px, 8vw, 92px);
+            line-height: 0.95;
+            letter-spacing: -0.07em;
+            margin-bottom: 16px;
+        }
+
+        .tagline {
+            font-size: 18px;
+            line-height: 1.7;
+            color: var(--muted);
+            max-width: 760px;
+            margin: 0 auto 22px;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 168px;
+            padding: 15px 22px;
+            border-radius: 18px;
+            background: #ffffff;
+            color: #121212;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            opacity: 0.94;
+        }
+
+        .search-shell {
+            width: min(760px, 100%);
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 12px;
+        }
+
+        .search-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--text);
+            font: inherit;
+            font-size: 17px;
+            padding: 8px 10px;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.42);
+        }
+
+        .main-content {
+            display: grid;
+            gap: 18px;
+        }
+
+        .intro-text,
+        .trust-section,
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            backdrop-filter: blur(24px);
+        }
+
+        .intro-text {
+            padding: 28px 30px;
+            color: var(--muted);
+            line-height: 1.85;
+            font-size: 16px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .feature-card {
+            padding: 28px;
+        }
+
+        .feature-card h2,
+        .feature-card h3 {
+            font-size: 28px;
+            letter-spacing: -0.04em;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: var(--muted);
+            line-height: 1.85;
+            font-size: 15px;
+        }
+
+        .trust-section {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .trust-section h3 {
+            font-size: 34px;
+            letter-spacing: -0.05em;
+            margin-bottom: 10px;
+        }
+
+        .trust-section p {
+            color: var(--muted);
+            line-height: 1.75;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 900px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .page {
+                width: calc(100% - 18px);
+            }
+
+            .hero-section,
+            .intro-text,
+            .feature-card,
+            .trust-section {
+                border-radius: 24px;
+                padding: 22px;
+            }
+
+            .hero-section h1 {
+                font-size: 52px;
+            }
+
+            .tagline {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+
+    <main class="page">
+        <div class="school-nav">
+            <h2 class="logo">chicken</h2>
+        </div>
+
+        <div class="hero-section">
+            <h1>One secure place for all your learning</h1>
+            <p class="tagline">Connecting students and teachers to the educational resources they need.</p>
+            <a class="cta-button" href="#educationContent">Get Started</a>
+            <div class="search-shell" style="margin-top: 24px;">
+                <input id="educationSearch" class="search-input" type="text" placeholder="Search more learning info">
+            </div>
+        </div>
+
+        <div class="main-content" id="educationContent">
+            <p class="intro-text">
+                chicken is a comprehensive education platform designed to bring together study materials, subject
+                references, practice resources, and learning support in one secure, easy-to-use environment for
+                students, teachers, and school communities.
+            </p>
+
+            <div class="features-grid">
+                <section class="feature-card">
+                    <h2>Academic Subjects</h2>
+                    <p>Mathematics, science, English, history, literature, writing, reading, social studies, geography, biology, chemistry, physics, algebra, geometry, calculus, statistics, computer science, programming, foreign languages, art, and music.</p>
+                </section>
+
+                <section class="feature-card">
+                    <h2>Educational Services</h2>
+                    <p>Online courses, college credit, exam preparation, test prep, tutoring, homework help, study guides, practice tests, educational videos, interactive lessons, learning resources, curriculum support, academic support, and student success tools.</p>
+                </section>
+
+                <section class="feature-card">
+                    <h2>All Student Levels</h2>
+                    <p>K-12 education, elementary school, middle school, high school, college, university, graduate study, continuing education, adult learning, professional development, certification programs, degree programs, and homeschool education.</p>
+                </section>
+
+                <section class="feature-card">
+                    <h2>Test Preparation</h2>
+                    <p>SAT prep, ACT prep, GRE prep, GMAT prep, LSAT prep, MCAT prep, AP courses, standardized tests, college entrance exams, professional certification exams, state assessments, final exams, and midterm preparation.</p>
+                </section>
+
+                <section class="feature-card">
+                    <h3>Learning Methods</h3>
+                    <p>Interactive learning, video lessons, practice quizzes, flashcards, study notes, adaptive learning, personalized education, self-paced learning, collaborative learning, project-based learning, STEM education, critical thinking, and problem solving.</p>
+                </section>
+
+                <section class="feature-card">
+                    <h3>Learning Support</h3>
+                    <p>Reference material, classroom-ready resources, revision support, research access, educational reading, and structured information spaces that help learners stay focused and organized across everyday schoolwork.</p>
+                </section>
+            </div>
+
+            <div class="trust-section">
+                <h3>Trusted by schools nationwide</h3>
+                <p>Join thousands of students and educators using chicken to support digital learning, review, classroom access, and day-to-day academic discovery.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const searchInput = document.getElementById('educationSearch');
+        const AUTO_OPEN_KEY = 'educationAutoOpenHome';
+        const autoOpenEnabled = localStorage.getItem(AUTO_OPEN_KEY) !== 'false';
+        let autoTimer = null;
+
+        function goHome() {
+            localStorage.setItem('educationLandingBypassOnce', 'true');
+            window.location.href = './index.html';
+        }
+
+        function checkChicken(value) {
+            if ((value || '').trim().toLowerCase() === 'chicken') {
+                goHome();
+            }
+        }
+
+        searchInput.addEventListener('input', (event) => {
+            checkChicken(event.target.value);
+        });
+
+        if (autoOpenEnabled) {
+            autoTimer = window.setTimeout(goHome, 60000);
+        }
+
+        window.addEventListener('beforeunload', () => {
+            if (autoTimer) {
+                window.clearTimeout(autoTimer);
+            }
+        });
+    </script>
+</body>
+</html>

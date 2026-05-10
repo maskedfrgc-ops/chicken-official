@@ -275,6 +275,21 @@
         <button onclick="importData()">import data</button>
         <button onclick="clearAllData()">clear all data</button>
       </section>
+
+      <section id="educationSettings" class="settings-section">
+        <h2>education page</h2>
+        <p>control the education landing page auto-open behavior</p>
+        <div class="toggle-switch">
+          <label for="educationLandingToggle">show education page first</label>
+          <input type="checkbox" id="educationLandingToggle">
+        </div>
+        <p id="educationLandingStatus"></p>
+        <div class="toggle-switch">
+          <label for="educationAutoToggle">auto open home after 60 seconds</label>
+          <input type="checkbox" id="educationAutoToggle">
+        </div>
+        <p id="educationAutoStatus"></p>
+      </section>
     </div>
   </main>
 
@@ -283,7 +298,11 @@ const adsToggle=document.getElementById("adsToggle");
 const adsStatus=document.getElementById("adsStatus");
 const proxySelect=document.getElementById("proxySelect");
 const proxyStatus=document.getElementById("proxyStatus");
+const educationAutoToggle=document.getElementById("educationAutoToggle");
+const educationAutoStatus=document.getElementById("educationAutoStatus");
 const PROXY_SETTING_KEY="proxyBackend";
+const EDUCATION_AUTO_KEY="educationAutoOpenHome";
+const EDUCATION_LANDING_KEY="educationLandingEnabled";
 function getSavedProxyBackend(){
   const savedValue=localStorage.getItem(PROXY_SETTING_KEY);
   if(savedValue==="auto"){
@@ -308,6 +327,17 @@ function updateAdSetting(s){
   adsStatus.textContent=s?"ads are on.":"ads are off.";
   alert(`ads are now ${s?"on":"off"}.\nshould work now`);
 }
+function updateEducationAutoSetting(enabled){
+  localStorage.setItem(EDUCATION_AUTO_KEY,enabled?"true":"false");
+  educationAutoStatus.textContent=enabled?"education page will auto open home after 60 seconds.":"education page auto open is off.";
+}
+function updateEducationLandingSetting(enabled){
+  localStorage.setItem(EDUCATION_LANDING_KEY,enabled?"true":"false");
+  const landingStatus=document.getElementById("educationLandingStatus");
+  if(landingStatus){
+    landingStatus.textContent=enabled?"education page opens first when the site loads.":"site opens straight to home.";
+  }
+}
 window.addEventListener("load",()=>{
   const e=localStorage.getItem("adsEnabled");
   const s=e===null?true:e==="true";
@@ -316,8 +346,19 @@ window.addEventListener("load",()=>{
   const proxyBackend=getSavedProxyBackend();
   proxySelect.value=proxyBackend;
   updateProxyStatus(proxyBackend);
+  const educationAutoEnabled=localStorage.getItem(EDUCATION_AUTO_KEY)!=="false";
+  educationAutoToggle.checked=educationAutoEnabled;
+  updateEducationAutoSetting(educationAutoEnabled);
+  const educationLandingEnabled=localStorage.getItem(EDUCATION_LANDING_KEY)!=="false";
+  const educationLandingToggle=document.getElementById("educationLandingToggle");
+  if(educationLandingToggle){
+    educationLandingToggle.checked=educationLandingEnabled;
+    updateEducationLandingSetting(educationLandingEnabled);
+  }
 });
 adsToggle.addEventListener("change",()=>{updateAdSetting(adsToggle.checked);});
+educationAutoToggle.addEventListener("change",()=>{updateEducationAutoSetting(educationAutoToggle.checked);});
+document.getElementById("educationLandingToggle")?.addEventListener("change",()=>{updateEducationLandingSetting(document.getElementById("educationLandingToggle").checked);});
 proxySelect.addEventListener("change",()=>{updateProxySetting(proxySelect.value);});
 function openInAboutBlank() {
   const currentUrl = window.location.href;
