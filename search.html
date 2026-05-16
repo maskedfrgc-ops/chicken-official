@@ -248,6 +248,7 @@
             typeof window.__uv$config !== 'undefined' &&
             typeof window.registerSW === 'function';
         const connection = hasUv ? new BareMux.BareMuxConnection('/baremux/worker.js') : null;
+        let transportPromise = null;
         const historyStack = [];
         let historyIndex = -1;
 
@@ -285,6 +286,17 @@
             }
         }
 
+        async function ensureTransport(wispUrl) {
+            if (!transportPromise) {
+                transportPromise = connection.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl }]).catch((error) => {
+                    transportPromise = null;
+                    throw error;
+                });
+            }
+
+            return transportPromise;
+        }
+
         async function navigate(raw) {
             const value = raw.trim();
             if (!value) return;
@@ -312,9 +324,7 @@
                     location.host +
                     '/wisp/';
 
-                if ((await connection.getTransport()) !== '/epoxy/index.mjs') {
-                    await connection.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl }]);
-                }
+                await ensureTransport(wispUrl);
 
                 setFrame(__uv$config.prefix + __uv$config.encodeUrl(target), true);
                 statusLine.textContent = 'proxy mode active';
