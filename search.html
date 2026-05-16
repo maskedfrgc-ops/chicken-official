@@ -257,12 +257,14 @@
             return params.get('url') || '';
         }
 
-        function setFrame(url, push = true) {
+        function setFrame(url, push = true, updateStatus = true) {
             if (!url) return;
             browserFrame.src = url;
             emptyState.style.display = 'none';
             addressInput.value = url;
-            statusLine.textContent = url;
+            if (updateStatus) {
+                statusLine.textContent = url;
+            }
 
             if (push) {
                 historyStack.splice(historyIndex + 1);
@@ -326,11 +328,12 @@
 
                 await ensureTransport(wispUrl);
 
-                setFrame(__uv$config.prefix + __uv$config.encodeUrl(target), true);
+                setFrame(__uv$config.prefix + __uv$config.encodeUrl(target), true, false);
                 statusLine.textContent = 'proxy mode active';
             } catch (error) {
-                statusLine.textContent = 'proxy failed, using direct mode';
-                setFrame(target, true);
+                console.error('UV proxy failed', error);
+                setFrame(target, true, false);
+                statusLine.textContent = `proxy failed: ${error?.message || 'unknown error'}; using direct mode`;
             }
         }
 
