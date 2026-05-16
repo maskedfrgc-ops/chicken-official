@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Arcady - Chat</title>
+  <link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/arcady-web/arcady-web.github.io@main/favicon/checking-you-out-blue-emoji-blue.png">
+  <link rel="shortcut icon" type="image/png" href="https://cdn.jsdelivr.net/gh/arcady-web/arcady-web.github.io@main/favicon/checking-you-out-blue-emoji-blue.png">
+  <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/arcady-web/arcady-web.github.io@main/favicon/checking-you-out-blue-emoji-blue.png">
+  <script src="../shared-favicon.js?v=1" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .chat-page-shell {
+      width: min(1080px, calc(100% - 24px));
+      margin: 128px auto 48px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .chat-page-hero {
+      padding: 2rem;
+      text-align: left;
+    }
+
+    .chat-page-kicker {
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+
+    .chat-page-title {
+      margin: 0.5rem 0 0;
+      font-size: clamp(2.2rem, 4vw, 3.6rem);
+      line-height: 0.96;
+    }
+
+    .chat-page-copy {
+      max-width: 720px;
+      margin-top: 0.85rem;
+      font-size: 1.05rem;
+      line-height: 1.65;
+      opacity: 0.84;
+    }
+
+    .chat-page-shell .nickname-panel {
+      margin: 0;
+      max-width: none;
+      padding: 1.25rem;
+      border-radius: 24px;
+    }
+
+    .chat-page-shell .home-chat-panel {
+      margin: 0;
+      max-width: none;
+    }
+
+    .chat-page-shell .home-chat-feed {
+      height: min(520px, 58vh);
+    }
+
+    @media (max-width: 768px) {
+      .chat-page-shell {
+        margin-top: 150px;
+      }
+
+      .chat-page-hero {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="glass" id="nav-bar">
+    <a href="../index.html" class="nav-logo">
+      Arcady
+    </a>
+    <div class="nav-links">
+      <a href="../index.html"><i data-lucide="home"></i> Home</a>
+      <a href="games.html"><i data-lucide="gamepad-2"></i> Games</a>
+      <a href="proxys.html"><i data-lucide="layout-grid"></i> Proxys</a>
+      <a href="websites.html"><i data-lucide="globe"></i> Websites</a>
+      <a href="chat.html"><i data-lucide="message-circle"></i> Chat</a>
+      <a href="chatgpt.html"><i data-lucide="brain"></i> Ai</a>
+      <button id="settings-btn"><i data-lucide="settings"></i></button>
+    </div>
+  </nav>
+
+  <div id="settings-panel" class="glass">
+    <label for="bg-color">Background Color:</label>
+    <input type="color" id="bg-color" value="#87CEEB">
+    <label for="font-color">Font Color:</label>
+    <input type="color" id="font-color" value="#000000">
+    <label for="font-style">Font Style:</label>
+    <select id="font-style">
+      <option value="'Fredoka', sans-serif">Fredoka</option>
+      <option value="'Roboto', sans-serif">Roboto</option>
+      <option value="'Playfair Display', serif">Playfair Display</option>
+    </select>
+    <label for="bg-image">Background Image:</label>
+    <input type="file" id="bg-image" accept="image/*">
+    <button id="open-about-blank">Open in about:blank</button>
+    <label for="tab-title">Tab Cloak Title:</label>
+    <input type="text" id="tab-title" placeholder="e.g., Google Classroom">
+    <label for="tab-favicon">Tab Cloak Favicon URL:</label>
+    <input type="text" id="tab-favicon" placeholder="https://.../favicon.ico">
+    <button id="apply-cloak">Apply Tab Cloak</button>
+    <label>Font Glow:</label>
+    <input type="checkbox" id="font-glow">
+    <label for="nav-position">Nav Position:</label>
+    <select id="nav-position">
+      <option value="top-center">Top Center</option>
+      <option value="bottom-center">Bottom Center</option>
+      <option value="left">Left Side</option>
+      <option value="right">Right Side</option>
+    </select>
+    <button id="reset-settings">Reset All Settings</button>
+  </div>
+
+  <main class="chat-page-shell">
+    <section class="glass chat-page-hero">
+      <div class="chat-page-kicker">Arcady Chat</div>
+      <h1 class="chat-page-title">Same live chat, now on its own page.</h1>
+      <p class="chat-page-copy">This page uses the same Arcady chat system as the homepage. Set your nickname, jump in, and the messages will stay synced with the homepage chat feed.</p>
+    </section>
+
+    
+
+    <section class="nickname-panel glass">
+      <label for="nickname-input" class="nickname-label">Set your nickname</label>
+      <div class="nickname-avatar-row">
+        <button type="button" class="nickname-avatar-btn" id="nickname-avatar-btn" aria-label="Add profile picture">
+          <img class="nickname-avatar-preview-img" id="nickname-avatar-preview-img" alt="" width="48" height="48" hidden>
+          <span class="nickname-avatar-initial" id="nickname-avatar-initial">?</span>
+        </button>
+        <input type="file" id="nickname-avatar-input" accept="image/*" hidden>
+        <button type="button" class="nickname-avatar-clear" id="nickname-avatar-clear">Clear pic</button>
+        <span class="nickname-avatar-hint">Optional picture shows on your chat messages.</span>
+      </div>
+      <div class="nickname-row">
+        <input id="nickname-input" class="nickname-input" type="text" maxlength="24" placeholder="Type a nickname">
+        <button id="nickname-save" class="nickname-save" type="button">Save</button>
+      </div>
+    </section>
+
+    <section class="home-chat-panel" id="home-chat-panel">
+      <div class="home-chat-header">
+        <div>
+          <div class="home-chat-kicker">Arcady Chat</div>
+          <h3 class="home-chat-title">Quick homepage chat</h3>
+        </div>
+        <div class="home-chat-status" id="home-chat-status">Set your nickname above to start chatting.</div>
+      </div>
+      <div class="home-chat-feed" id="home-chat-feed" aria-live="polite">
+        <div class="home-chat-empty" id="home-chat-empty">No messages yet. Save a nickname above and be the first one to say something.</div>
+      </div>
+      <div class="home-chat-typing-bar" id="home-chat-typing" aria-live="polite" aria-atomic="true" hidden></div>
+      <div class="home-chat-compose">
+        <div class="home-chat-compose-row">
+          <input id="home-chat-input" class="home-chat-input" type="text" maxlength="400" placeholder="Set your nickname above to unlock chat">
+          <label for="home-chat-image-input" class="home-chat-attach" id="home-chat-attach">Image</label>
+          <button id="home-chat-gif-toggle" class="home-chat-gif-toggle" type="button">Media</button>
+          <input id="home-chat-image-input" type="file" accept="image/*" hidden>
+          <button id="home-chat-send" class="home-chat-send" type="button">Send</button>
+        </div>
+        <div class="home-chat-compose-meta">
+          <div class="home-chat-file" id="home-chat-file">No image selected</div>
+        </div>
+        <div class="home-chat-gif-panel" id="home-chat-gif-panel">
+          <div class="home-chat-gif-toolbar">
+            <div class="home-chat-gif-title">Media &amp; stickers</div>
+            <div class="home-chat-gif-status" id="home-chat-gif-status">Open Media to load the libraries.</div>
+          </div>
+          <div class="home-chat-sticker-mode-bar" role="group" aria-label="How to send stickers">
+            <span class="home-chat-sticker-mode-label">Send stickers as</span>
+            <label class="home-chat-sticker-mode-opt"><input type="radio" name="home-chat-sticker-mode" id="home-chat-sticker-mode-box" value="box" checked> Large (box)</label>
+            <label class="home-chat-sticker-mode-opt"><input type="radio" name="home-chat-sticker-mode" id="home-chat-sticker-mode-inline" value="inline"> Inline 32×32</label>
+          </div>
+          <div class="home-chat-gif-section">
+            <div class="home-chat-gif-subtitle">Arcady library</div>
+            <div class="home-chat-gif-grid" id="home-chat-gif-grid">
+              <div class="home-chat-gif-empty">Open Media to load the Arcady library.</div>
+            </div>
+          </div>
+          <div class="home-chat-gif-section home-chat-slackmojis-section">
+            <div class="home-chat-gif-subtitle">Slackmojis <a class="home-chat-slackmojis-source" href="https://slackmojis.com/" target="_blank" rel="noopener noreferrer">slackmojis.com</a></div>
+            <div class="home-chat-gif-grid home-chat-slackmojis-grid" id="home-chat-slackmojis-grid">
+              <div class="home-chat-gif-empty">Open Media to load Slackmojis from slackmojis.com.</div>
+            </div>
+          </div>
+          <div class="home-chat-gif-section home-chat-bluemoji-section">
+            <div class="home-chat-gif-subtitle">Bluemoji <a class="home-chat-slackmojis-source" href="https://bluemoji.io/" target="_blank" rel="noopener noreferrer">bluemoji.io</a></div>
+            <div class="home-chat-gif-grid home-chat-bluemoji-grid" id="home-chat-bluemoji-grid">
+              <div class="home-chat-gif-empty">Open Media to load Bluemoji from bluemoji.io.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>
+    lucide.createIcons();
+
+    const settingsBtn = document.getElementById('settings-btn');
+    const settingsPanel = document.getElementById('settings-panel');
+    const body = document.body;
+    const navBar = document.getElementById('nav-bar');
+
+    settingsBtn.addEventListener('click', () => {
+      settingsPanel.style.display = settingsPanel.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    window.addEventListener('load', () => {
+      if (localStorage.getItem('bgColor')) body.style.backgroundColor = localStorage.getItem('bgColor');
+      if (localStorage.getItem('fontColor')) body.style.color = localStorage.getItem('fontColor');
+      if (localStorage.getItem('fontStyle')) body.style.fontFamily = localStorage.getItem('fontStyle');
+      if (localStorage.getItem('bgImage')) {
+        body.style.backgroundImage = `url(${localStorage.getItem('bgImage')})`;
+        body.style.backgroundSize = 'cover';
+        body.style.backgroundPosition = 'center';
+      }
+      if (localStorage.getItem('fontGlow') === 'true') {
+        body.classList.add('font-glow');
+        document.getElementById('font-glow').checked = true;
+      }
+      if (localStorage.getItem('navPosition')) {
+        applyNavPosition(localStorage.getItem('navPosition'));
+        document.getElementById('nav-position').value = localStorage.getItem('navPosition');
+      }
+      if (localStorage.getItem('tabTitle')) document.title = localStorage.getItem('tabTitle');
+      if (localStorage.getItem('tabFavicon')) {
+        let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.rel = 'icon';
+        link.href = localStorage.getItem('tabFavicon');
+        document.head.appendChild(link);
+      }
+    });
+
+    document.getElementById('bg-color').addEventListener('input', e => {
+      body.style.backgroundColor = e.target.value;
+      localStorage.setItem('bgColor', e.target.value);
+    });
+
+    document.getElementById('font-color').addEventListener('input', e => {
+      body.style.color = e.target.value;
+      localStorage.setItem('fontColor', e.target.value);
+    });
+
+    document.getElementById('font-style').addEventListener('change', e => {
+      body.style.fontFamily = e.target.value;
+      localStorage.setItem('fontStyle', e.target.value);
+    });
+
+    document.getElementById('bg-image').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const url = ev.target.result;
+          body.style.backgroundImage = `url(${url})`;
+          body.style.backgroundSize = 'cover';
+          body.style.backgroundPosition = 'center';
+          localStorage.setItem('bgImage', url);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    document.getElementById('open-about-blank').addEventListener('click', () => {
+      const win = window.open('about:blank', '_blank');
+      const iframe = win.document.createElement('iframe');
+      iframe.src = location.href;
+      iframe.style.cssText = 'position:fixed;inset:0;border:none;width:100%;height:100%;';
+      win.document.body.appendChild(iframe);
+    });
+
+    document.getElementById('apply-cloak').addEventListener('click', () => {
+      const title = document.getElementById('tab-title').value.trim();
+      const favicon = document.getElementById('tab-favicon').value.trim();
+      if (title) {
+        document.title = title;
+        localStorage.setItem('tabTitle', title);
+      }
+      if (favicon) {
+        let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.rel = 'icon';
+        link.href = favicon;
+        document.head.appendChild(link);
+        localStorage.setItem('tabFavicon', favicon);
+      }
+    });
+
+    document.getElementById('font-glow').addEventListener('change', e => {
+      body.classList.toggle('font-glow', e.target.checked);
+      localStorage.setItem('fontGlow', e.target.checked);
+    });
+
+    document.getElementById('nav-position').addEventListener('change', e => {
+      const pos = e.target.value;
+      applyNavPosition(pos);
+      localStorage.setItem('navPosition', pos);
+    });
+
+    function applyNavPosition(pos) {
+      navBar.style.position = 'fixed';
+      navBar.style.transform = '';
+      navBar.style.flexDirection = 'row';
+      navBar.style.minWidth = '92vw';
+      navBar.style.width = 'auto';
+      navBar.style.height = 'auto';
+      navBar.style.minHeight = '';
+      navBar.style.borderRadius = '24px';
+
+      if (pos === 'top-center') {
+        navBar.style.top = '20px';
+        navBar.style.bottom = '';
+        navBar.style.left = '50%';
+        navBar.style.right = '';
+        navBar.style.transform = 'translateX(-50%)';
+      } else if (pos === 'bottom-center') {
+        navBar.style.top = '';
+        navBar.style.bottom = '20px';
+        navBar.style.left = '50%';
+        navBar.style.right = '';
+        navBar.style.transform = 'translateX(-50%)';
+      } else if (pos === 'left') {
+        navBar.style.top = '50%';
+        navBar.style.bottom = '';
+        navBar.style.left = '20px';
+        navBar.style.right = '';
+        navBar.style.transform = 'translateY(-50%)';
+        navBar.style.flexDirection = 'column';
+        navBar.style.minWidth = 'auto';
+        navBar.style.minHeight = '50vh';
+      } else if (pos === 'right') {
+        navBar.style.top = '50%';
+        navBar.style.bottom = '';
+        navBar.style.left = '';
+        navBar.style.right = '20px';
+        navBar.style.transform = 'translateY(-50%)';
+        navBar.style.flexDirection = 'column';
+        navBar.style.minWidth = 'auto';
+        navBar.style.minHeight = '50vh';
+      }
+    }
+
+    document.getElementById('reset-settings').addEventListener('click', () => {
+      if (!confirm('Reset all settings to default?')) return;
+
+      localStorage.clear();
+
+      body.style.backgroundColor = '#87CEEB';
+      body.style.backgroundImage = '';
+      body.style.color = '#000000';
+      body.style.fontFamily = "'Fredoka', sans-serif";
+      body.classList.remove('font-glow');
+
+      document.getElementById('bg-color').value = '#87CEEB';
+      document.getElementById('font-color').value = '#000000';
+      document.getElementById('font-style').value = "'Fredoka', sans-serif";
+      document.getElementById('font-glow').checked = false;
+      document.getElementById('nav-position').value = 'top-center';
+      document.getElementById('tab-title').value = '';
+      document.getElementById('tab-favicon').value = '';
+
+      document.title = 'Arcady - Chat';
+      const link = document.querySelector("link[rel*='icon']");
+      if (link) link.remove();
+
+      applyNavPosition('top-center');
+      settingsPanel.style.display = 'none';
+    });
+
+    const nicknameInput = document.getElementById('nickname-input');
+    const nicknameSave = document.getElementById('nickname-save');
+
+    if (nicknameInput) {
+      nicknameInput.value = localStorage.getItem('arcadyVisitorNickname') || '';
+    }
+
+    if (nicknameSave && nicknameInput) {
+      const saveNickname = () => {
+        const nickname = nicknameInput.value.trim().slice(0, 24);
+        localStorage.setItem('arcadyVisitorNickname', nickname);
+        window.dispatchEvent(new CustomEvent('arcady:nickname-change', {
+          detail: { nickname: nickname }
+        }));
+      };
+
+      nicknameSave.addEventListener('click', saveNickname);
+      nicknameInput.addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+          saveNickname();
+        }
+      });
+    }
+  </script>
+  <script>
+    (function () {
+
+      function load(src) {
+        return new Promise(function (resolve, reject) {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+
+      load('../features/admin/firebase-config.js?v=14').then(function () {
+        return load('../features/admin/site-admin.js?v=14').then(function () {
+          return load('../features/home/home-chat.js?v=6');
+        });
+      }).catch(function (error) {
+        console.error('Arcady admin loader failed:', error);
+      });
+    })();
+  </script>
+  <script src="../features/shared-more-windows.js?v=1"></script>
+  <script src="../features/broadcast-more-notify.js?v=1"></script>
+</body>
+</html>

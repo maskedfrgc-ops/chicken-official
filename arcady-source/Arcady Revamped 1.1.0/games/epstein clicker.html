@@ -1,0 +1,2677 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="https://cdn.jsdelivr.net/gh/StaticQuasar931/Images@main/icon.png" />
+
+  <title>Epstein Clicker | Ome was here lol</title>
+  <meta name="description" content="Epstein Clicker is a fast retro clicker game with upgrades, auto-earn, stats, anti-cheat, and a live leaderboard. Play in-browser with an arcade neon style by StaticQuasar931." />
+  <meta name="keywords" content="epstein clicker, clicker game, retro clicker, browser game, idle clicker, leaderboard clicker, arcade clicker, staticquasar931" />
+
+  <link rel="canonical" href="https://staticquasar931.github.io/Epstein-Clicker/" />
+
+  <meta property="og:title" content="Epstein Clicker | Ome was here lol" />
+  <meta property="og:description" content="Retro neon clicker game with upgrades, stats, anti-cheat, and a live leaderboard." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://epsteinclicker.com/" />
+  <meta property="og:image" content="https://cdn.jsdelivr.net/gh/CupcakeIdeas/CupcakeIdeas.github.io@main/cupcake47.png" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- Firebase (for Top 30 leaderboard) -->
+  <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --green: #00ff5a;
+      --bg: #000;
+      --danger: #ff3b30;
+      --cyan: #00ffff;
+      --purple: #ff00ff;
+      --yellow: #ffff00;
+      --orange: #ff8800;
+      --blue: #0088ff;
+      --pink: #ff88ff;
+    }
+
+    body {
+      margin: 0;
+      padding-top: 42px;
+      background: linear-gradient(135deg, #000 0%, #001122 50%, #000 100%);
+      background-attachment: fixed;
+      color: var(--green);
+      font-family: 'Press Start 2P', monospace;
+      text-align: center;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(0, 255, 90, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(0, 136, 255, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 22px 16px 28px;
+    }
+
+    .title {
+      font-size: 24px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(0, 255, 90, .55), 0 0 20px rgba(0, 255, 255, .3);
+      margin: 6px 0 14px;
+      background: linear-gradient(90deg, var(--green), var(--cyan), var(--green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: titleGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes titleGlow {
+
+      0%,
+      100% {
+        filter: drop-shadow(0 0 10px rgba(0, 255, 90, .55));
+      }
+
+      50% {
+        filter: drop-shadow(0 0 20px rgba(0, 255, 255, .8));
+      }
+    }
+
+    .score {
+      font-size: 18px;
+      margin: 0 0 10px;
+      text-shadow: 0 0 10px rgba(0, 255, 90, .40), 0 0 15px rgba(0, 255, 90, .2);
+      color: var(--green);
+    }
+
+    .sub {
+      font-size: 10px;
+      opacity: .88;
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+
+    .scanlines::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(to bottom,
+          rgba(255, 255, 255, 0.03),
+          rgba(255, 255, 255, 0.03) 1px,
+          rgba(0, 0, 0, 0) 3px,
+          rgba(0, 0, 0, 0) 6px);
+      mix-blend-mode: overlay;
+      opacity: .35;
+      z-index: 2;
+    }
+
+    #clickBtn {
+      width: min(480px, 98vw);
+      aspect-ratio: 3/4;
+      object-fit: contain;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-drag: none;
+      display: block;
+      margin: 6px auto 18px;
+      transition: transform .08s ease, filter .08s ease;
+      animation: glowPulse 2s infinite alternate;
+      z-index: 1;
+      position: relative;
+    }
+
+    #clickBtn:hover {
+      transform: scale(1.03);
+    }
+
+    #clickBtn:active {
+      transform: scale(0.95);
+    }
+
+    @keyframes glowPulse {
+      from {
+        filter: drop-shadow(0 0 14px rgba(0, 255, 90, .45)) drop-shadow(0 0 20px rgba(0, 255, 255, .2));
+      }
+
+      to {
+        filter: drop-shadow(0 0 26px rgba(0, 255, 90, .85)) drop-shadow(0 0 35px rgba(0, 255, 255, .4));
+      }
+    }
+
+    .panel {
+      border: 3px solid var(--green);
+      background: linear-gradient(135deg, rgba(0, 50, 0, .4) 0%, rgba(0, 20, 40, .4) 100%);
+      box-shadow: 0 0 18px rgba(0, 255, 90, .35), inset 0 0 20px rgba(0, 255, 90, .1);
+      padding: 14px;
+      margin-top: 18px;
+      position: relative;
+      z-index: 1;
+      border-image: linear-gradient(135deg, var(--green), var(--cyan), var(--green)) 1;
+    }
+
+    .panel h2 {
+      font-size: 14px;
+      margin: 6px 0 12px;
+      text-decoration: underline;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 8px;
+      border-top: 1px solid rgba(0, 255, 90, .55);
+      font-size: 10px;
+      line-height: 1.35;
+      text-align: left;
+      transition: background 0.2s ease;
+    }
+
+    .row:first-child {
+      border-top: none;
+    }
+
+    .row:hover {
+      background: rgba(0, 255, 90, .08);
+      border-left: 3px solid var(--cyan);
+      padding-left: 5px;
+    }
+
+    button {
+      background: linear-gradient(135deg, #000 0%, #001a00 100%);
+      color: var(--green);
+      border: 2px solid var(--green);
+      padding: 8px 10px;
+      font-family: inherit;
+      font-size: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 255, 90, .25), inset 0 0 10px rgba(0, 255, 90, .1);
+      min-width: 86px;
+      transition: all 0.2s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background: linear-gradient(135deg, #001a00 0%, #003300 100%);
+      box-shadow: 0 0 15px rgba(0, 255, 90, .5), inset 0 0 15px rgba(0, 255, 90, .2);
+      transform: translateY(-1px);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 0 8px rgba(0, 255, 90, .3), inset 0 0 8px rgba(0, 255, 90, .15);
+    }
+
+    button:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .danger {
+      border-color: var(--danger);
+      color: var(--danger);
+      box-shadow: 0 0 10px rgba(255, 59, 48, .25), inset 0 0 10px rgba(255, 59, 48, .1);
+      margin-top: 14px;
+      background: linear-gradient(135deg, #1a0000 0%, #000 100%);
+    }
+
+    .danger:hover:not(:disabled) {
+      background: linear-gradient(135deg, #330000 0%, #1a0000 100%);
+      box-shadow: 0 0 15px rgba(255, 59, 48, .5), inset 0 0 15px rgba(255, 59, 48, .2);
+    }
+
+    .footer {
+      margin-top: 12px;
+      font-size: 8px;
+      opacity: .7;
+    }
+
+    .floatText {
+      position: fixed;
+      pointer-events: none;
+      color: var(--green);
+      font-size: 13px;
+      text-shadow: 0 0 10px rgba(0, 255, 90, .5);
+      animation: floatUp .7s ease-out forwards;
+      z-index: 3;
+    }
+
+    @keyframes floatUp {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 0) scale(.95);
+      }
+
+      20% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -70px) scale(1.05);
+      }
+    }
+
+    /* === Layout: center game, leaderboard on right === */
+    .mainLayout {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 22px;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 22px 16px 28px;
+    }
+
+    .side {
+      width: 360px;
+      flex: 0 0 360px;
+    }
+
+    .centerCol {
+      flex: 1 1 auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Let the center column control width; keep your existing wrap styling */
+    .side-right .panel {
+      margin-top: 0;
+    }
+
+    .side-left .panel {
+      margin-top: 0;
+    }
+
+    /* Stat Board Styles - Retro Theme */
+    #statBoard {
+      min-height: 650px;
+      padding: 16px 14px;
+      background: rgba(0, 20, 0, .4);
+      border: 2px solid var(--green);
+      box-shadow: 0 0 20px rgba(0, 255, 90, .3), inset 0 0 30px rgba(0, 0, 0, .6);
+      position: relative;
+    }
+
+    #statBoard::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg,
+          rgba(0, 255, 90, .03) 0px,
+          rgba(0, 255, 90, .03) 1px,
+          transparent 1px,
+          transparent 2px);
+      pointer-events: none;
+      opacity: .4;
+    }
+
+    .retroTitle {
+      margin-bottom: 16px;
+      font-size: 14px;
+      text-shadow: 0 0 8px rgba(0, 255, 90, .8), 2px 2px 0 rgba(0, 0, 0, .8);
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--green);
+      border-top: 1px solid rgba(0, 255, 90, .3);
+      padding-top: 10px;
+      letter-spacing: 2px;
+      color: var(--green);
+    }
+
+    .statSection {
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .retroLevelSection {
+      background: rgba(0, 255, 90, .05);
+      border: 1px solid rgba(0, 255, 90, .2);
+      padding: 12px;
+      margin-bottom: 18px;
+      box-shadow: inset 0 0 15px rgba(0, 0, 0, .5);
+    }
+
+    .retroTitleBar {
+      font-size: 11px;
+      color: var(--green);
+      text-shadow: 0 0 6px rgba(0, 255, 90, .7), 1px 1px 0 rgba(0, 0, 0, .8);
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      background: rgba(0, 0, 0, .6);
+      border: 1px solid var(--green);
+      border-left: 4px solid var(--green);
+      letter-spacing: 1.5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .8);
+    }
+
+    #statBoard .statRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 8px;
+      font-size: 10px;
+      line-height: 1.7;
+      border: 1px solid rgba(0, 255, 90, .15);
+      background: rgba(0, 0, 0, .4);
+      margin-bottom: 4px;
+      border-left: 3px solid transparent;
+      transition: all .15s ease;
+      position: relative;
+    }
+
+    .retroRow:hover {
+      background: rgba(0, 255, 90, .08);
+      border-left-color: var(--green);
+      box-shadow: inset 2px 0 0 var(--green);
+    }
+
+    #statBoard .statRow:last-child {
+      margin-bottom: 0;
+    }
+
+    #statBoard .statLabel {
+      text-align: left;
+      opacity: .95;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      font-weight: normal;
+      letter-spacing: .5px;
+    }
+
+    .retroBullet {
+      color: var(--green);
+      text-shadow: 0 0 4px rgba(0, 255, 90, .8);
+      font-weight: bold;
+      width: 14px;
+      display: inline-block;
+      font-size: 11px;
+    }
+
+    #statBoard .statValue {
+      text-align: right;
+      font-weight: bold;
+      font-size: 11px;
+      min-width: 85px;
+      letter-spacing: .5px;
+    }
+
+    /* Retro Color Themes */
+    .retroGreen {
+      color: #00ff5a;
+      text-shadow: 0 0 8px rgba(0, 255, 90, .7), 1px 1px 0 rgba(0, 0, 0, .8);
+    }
+
+    .retroCyan {
+      color: #00ffff;
+      text-shadow: 0 0 8px rgba(0, 255, 255, .7), 1px 1px 0 rgba(0, 0, 0, .8);
+    }
+
+    .retroAmber {
+      color: #ffaa00;
+      text-shadow: 0 0 8px rgba(255, 170, 0, .7), 1px 1px 0 rgba(0, 0, 0, .8);
+    }
+
+    .statLevel.retroGlow {
+      font-size: 16px !important;
+      color: #00ff88 !important;
+      text-shadow: 0 0 12px rgba(0, 255, 136, .9), 0 0 20px rgba(0, 255, 136, .5), 2px 2px 0 rgba(0, 0, 0, .8) !important;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    #statBoard .statDivider {
+      height: 2px;
+      background: repeating-linear-gradient(90deg,
+          var(--green) 0px,
+          var(--green) 4px,
+          transparent 4px,
+          transparent 8px);
+      margin: 14px 0;
+      border: none;
+      box-shadow: 0 0 6px rgba(0, 255, 90, .5);
+    }
+
+    .retroDivider {
+      opacity: .6;
+    }
+
+    .progressBarContainer {
+      margin-top: 10px;
+      height: 14px;
+      background: rgba(0, 0, 0, .8);
+      border: 2px solid var(--green);
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 1), 0 0 8px rgba(0, 255, 90, .4);
+    }
+
+    .retroProgress {
+      border-style: dashed;
+      border-width: 2px;
+    }
+
+    .progressBar {
+      height: 100%;
+      width: 0%;
+      transition: width .4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .retroProgressBar {
+      background: repeating-linear-gradient(90deg,
+          #00ff5a 0px,
+          #00ff88 2px,
+          #00ff5a 4px,
+          #00ff88 6px);
+      box-shadow: 0 0 10px rgba(0, 255, 90, .8), inset 0 0 8px rgba(0, 255, 136, .4);
+      animation: retroPulse 1.5s ease-in-out infinite;
+    }
+
+    .progressScanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg,
+          rgba(0, 0, 0, .1) 0px,
+          rgba(0, 0, 0, .1) 1px,
+          transparent 1px,
+          transparent 2px);
+      pointer-events: none;
+    }
+
+    @keyframes retroPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .85;
+      }
+    }
+
+    #lbList .row {
+      padding: 8px 6px;
+      font-size: 9px;
+    }
+
+    #lbList {
+      max-height: 520px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    #lbList::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    #lbList::-webkit-scrollbar-thumb {
+      background: rgba(0, 255, 90, .35);
+      border: 2px solid #000;
+    }
+
+    #lbList .row div:nth-child(1) {
+      min-width: 40px;
+    }
+
+    #lbList .row div:nth-child(3) {
+      min-width: 72px;
+      text-align: right;
+    }
+
+    input.lbInput {
+      width: 100%;
+      padding: 10px;
+      font-family: inherit;
+      font-size: 10px;
+      background: #000;
+      color: var(--green);
+      border: 2px solid var(--green);
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .lbHint {
+      font-size: 9px;
+      opacity: .85;
+      line-height: 1.6;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .lbMsg {
+      margin-top: 10px;
+      font-size: 9px;
+      opacity: .9;
+      text-align: left;
+      min-height: 14px;
+    }
+
+    @media (max-width: 1200px) {
+      .mainLayout {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .side {
+        width: min(980px, 100%);
+        flex: 1 1 auto;
+      }
+
+      .side-right .panel {
+        margin-top: 18px;
+      }
+
+      .side-left .panel {
+        margin-top: 18px;
+      }
+    }
+
+    /* ===== Retro Stock Ticker ===== */
+    #tickerWrap {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 42px;
+      background: #000;
+      border-bottom: 2px solid var(--green);
+      overflow: hidden;
+      z-index: 9999;
+      box-shadow: 0 0 18px rgba(0, 255, 90, .4);
+    }
+
+    #ticker {
+      display: flex;
+      width: 200%;
+      animation: tickerMove 14s linear infinite;
+      will-change: transform;
+      gap: 0;
+    }
+
+    #ticker span {
+      white-space: nowrap;
+      font-size: 13px;
+      color: var(--green);
+      text-shadow: 0 0 6px rgba(0, 255, 90, .8);
+      font-family: 'Press Start 2P', monospace;
+      letter-spacing: 1px;
+      line-height: 42px;
+    }
+
+    /* Move RIGHT like a market board */
+    @keyframes tickerMove {
+      from {
+        transform: translateX(-50%);
+      }
+
+      to {
+        transform: translateX(0);
+      }
+    }
+
+    /* ticker tight + constant */
+    .tickerItem {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 48px;
+      /* readable spacing */
+    }
+
+    .tickerBrand {
+      /* Reserved for future styling */
+    }
+
+    .tickerScore {
+      /* Reserved for future styling */
+    }
+
+    /* ===== Idle / AFK modal ===== */
+    #idleOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+
+    #idleBox {
+      width: min(520px, 92vw);
+      border: 3px solid var(--danger);
+      background: rgba(20, 0, 0, .6);
+      box-shadow: 0 0 22px rgba(255, 59, 48, .35);
+      padding: 18px 16px;
+      text-align: left;
+    }
+
+    #idleBox h3 {
+      margin: 0 0 10px;
+      font-size: 12px;
+      text-decoration: underline;
+      color: var(--danger);
+      text-shadow: 0 0 10px rgba(255, 59, 48, .35);
+    }
+
+    #idleBox p {
+      margin: 0 0 12px;
+      font-size: 9px;
+      line-height: 1.7;
+      opacity: .95;
+    }
+
+    #idleBox .idleRow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ===== Cheat Detection Popup ===== */
+    #cheatOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 20000;
+      animation: cheatPulse 0.5s ease-in-out;
+    }
+
+    @keyframes cheatPulse {
+      0% {
+        background: rgba(255, 0, 0, .3);
+      }
+
+      100% {
+        background: rgba(0, 0, 0, .95);
+      }
+    }
+
+    #cheatBox {
+      width: min(600px, 95vw);
+      border: 5px solid var(--danger);
+      background: rgba(40, 0, 0, .95);
+      box-shadow: 0 0 40px rgba(255, 59, 48, .8), inset 0 0 30px rgba(255, 0, 0, .2);
+      padding: 28px 24px;
+      text-align: center;
+      animation: cheatShake 0.5s ease-in-out;
+    }
+
+    @keyframes cheatShake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-10px);
+      }
+
+      75% {
+        transform: translateX(10px);
+      }
+    }
+
+    #cheatBox h3 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      text-decoration: none;
+      color: var(--danger);
+      text-shadow: 0 0 20px rgba(255, 59, 48, 1), 0 0 40px rgba(255, 59, 48, .8);
+      letter-spacing: 2px;
+      animation: cheatGlow 1s ease-in-out infinite alternate;
+    }
+
+    @keyframes cheatGlow {
+      from {
+        text-shadow: 0 0 20px rgba(255, 59, 48, 1), 0 0 40px rgba(255, 59, 48, .8);
+      }
+
+      to {
+        text-shadow: 0 0 30px rgba(255, 59, 48, 1), 0 0 60px rgba(255, 59, 48, 1);
+      }
+    }
+
+    #cheatBox p {
+      margin: 12px 0;
+      font-size: 12px;
+      line-height: 1.8;
+      opacity: 1;
+      color: #fff;
+    }
+
+    #cheatBox .cheatMessage {
+      font-size: 14px;
+      color: var(--danger);
+      text-shadow: 0 0 10px rgba(255, 59, 48, .6);
+      margin: 20px 0;
+      padding: 16px;
+      background: rgba(0, 0, 0, .5);
+      border: 2px solid var(--danger);
+    }
+
+    #cheatBox button {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 12px;
+      background: var(--danger);
+      color: #000;
+      border: 3px solid var(--danger);
+      box-shadow: 0 0 20px rgba(255, 59, 48, .6);
+    }
+
+    #cheatBox button:hover {
+      background: #ff6b60;
+      box-shadow: 0 0 30px rgba(255, 59, 48, 1);
+      transform: scale(1.05);
+    }
+
+    /* ===== StaticQuasar931 Visual SEO ===== */
+    :root{
+      --brand:#5ee1ff;
+      --glow:0 0 12px rgba(94,225,255,.65), 0 0 32px rgba(155,255,183,.35);
+      --shadow:0 10px 30px rgba(0,0,0,.4);
+    }
+
+    #staticMenu{
+      position:fixed; left:12px; top:54px; z-index:9999;
+      display:flex; gap:10px; align-items:center; user-select:none;
+      padding:10px 14px; border-radius:12px;
+      background:linear-gradient(135deg, rgba(20,20,28,.9), rgba(20,20,28,.6));
+      border:1px solid rgba(94,225,255,.35);
+      color:#e8f3ff; box-shadow:var(--glow), var(--shadow);
+      font-size:14px; animation:menuEnter .6s ease .15s both;
+    }
+    #staticMenu a{ color:#5ee1ff; font-weight:800; text-decoration:none }
+    #closeStaticMenu{
+      color:#f55; cursor:pointer; padding:2px 6px; border-radius:6px;
+      border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06)
+    }
+    @keyframes menuEnter{ from{opacity:0; transform:translateY(-8px)} to{opacity:1; transform:translateY(0)} }
+
+    #staticSlideMenu{
+      position:fixed; bottom:24px; right:24px; z-index:9999;
+      width:100px; height:100px; pointer-events:none; opacity:0;
+      transform:translateX(140px) scale(.96);
+    }
+    #staticSlideMenu a{ display:block; width:100%; height:100% }
+    #staticSlideMenu img{
+      width:100%; height:100%; object-fit:contain;
+      border:0; border-radius:0; background:transparent; box-shadow:none;
+      transition:opacity .25s ease;
+    }
+    .slide-in{ animation:slideIn 2s ease forwards }
+    .slide-out{ animation:slideOut 2s ease forwards }
+    @keyframes slideIn{ from{opacity:0; transform:translateX(140px) scale(.96)} to{opacity:1; transform:translateX(0) scale(1)} }
+    @keyframes slideOut{ from{opacity:1; transform:translateX(0) scale(1)} to{opacity:0; transform:translateX(140px) scale(.96)} }
+
+    @media (max-width:600px){
+      #staticMenu{ font-size:13px; padding:8px 12px }
+      #staticSlideMenu{ width:88px; height:88px }
+    }
+  </style>
+</head>
+
+<body class="scanlines">
+  <!-- Retro Stock Ticker -->
+  <div id="tickerWrap" aria-label="stock ticker">
+    <div id="ticker">
+      <span class="tickerItem">&nbsp;|&nbsp;epsteinclicker&nbsp;|&nbsp;Your&nbsp;Score&nbsp;:&nbsp;<span class="tickerScore">0</span>&nbsp;|&nbsp;</span>
+      <span class="tickerItem">&nbsp;|&nbsp;epsteinclicker&nbsp;|&nbsp;Your&nbsp;Score&nbsp;:&nbsp;<span class="tickerScore">0</span>&nbsp;|&nbsp;</span>
+      <span class="tickerItem">&nbsp;|&nbsp;epsteinclicker&nbsp;|&nbsp;Your&nbsp;Score&nbsp;:&nbsp;<span class="tickerScore">0</span>&nbsp;|&nbsp;</span>
+      <span class="tickerItem">&nbsp;|&nbsp;epsteinclicker&nbsp;|&nbsp;Your&nbsp;Score&nbsp;:&nbsp;<span class="tickerScore">0</span>&nbsp;|&nbsp;</span>
+      <span class="tickerItem">&nbsp;|&nbsp;epsteinclicker&nbsp;|&nbsp;Your&nbsp;Score&nbsp;:&nbsp;<span class="tickerScore">0</span>&nbsp;|&nbsp;</span>
+      <span class="tickerItem">&nbsp;|&nbsp;epsteinclicker&nbsp;|&nbsp;Your&nbsp;Score&nbsp;:&nbsp;<span class="tickerScore">0</span>&nbsp;|&nbsp;</span>
+      <span class="tickerItem">&nbsp;|&nbsp;epsteinclicker&nbsp;|&nbsp;Your&nbsp;Score&nbsp;:&nbsp;<span class="tickerScore">0</span>&nbsp;|&nbsp;</span>
+      <span class="tickerItem">&nbsp;|&nbsp;epsteinclicker&nbsp;|&nbsp;Your&nbsp;Score&nbsp;:&nbsp;<span class="tickerScore">0</span>&nbsp;|&nbsp;</span>
+    </div>
+  </div>
+
+  <!-- Static Menu (top-left) -->
+  <div id="staticMenu" role="region" aria-label="StaticQuasar menu">
+    <a href="https://sites.google.com/view/staticquasar931/gm3z" target="_blank" rel="noopener">More Unblocked Games by Static</a>
+    <span id="closeStaticMenu" title="Hide temporarily">✕</span>
+  </div>
+
+  <!-- Rotating quick link widget (bottom-right). Order: Google Form → Discord → Instagram -->
+  <div id="staticSlideMenu" aria-live="polite">
+    <a id="staticSlideLink" href="https://sites.google.com/view/staticquasar931/google-form" target="_blank" rel="noopener" aria-label="Open Google Form">
+      <img id="staticSlideImg" src="https://cdn.jsdelivr.net/gh/StaticQuasar931/Images@main/GoogleForm.png" alt="StaticQuasar931 Google Form for feedback and requests">
+    </a>
+  </div>
+
+  <!-- Idle / AFK overlay (pauses earning after 20 min of no interaction) -->
+  <div id="idleOverlay" role="dialog" aria-modal="true" aria-label="Are you still there?">    <div id="idleBox">
+      <h3>PAUSED — YOU STILL THERE?</h3>
+      <p>You were inactive for 20 minutes. The game is paused so auto-earning can't run in the background.</p>
+      <p>Click the button to resume.</p>
+      <div class="idleRow">
+        <button id="idleResumeBtn">I'M BACK</button>
+      </div>
+      <div class="footer" style="margin-top:10px; opacity:.75;">Tip: Leaving the tab or using scripts can trigger anti-cheat.</div>
+    </div>
+  </div>
+
+  <!-- Cheat Detection Popup -->
+  <div id="cheatOverlay" role="dialog" aria-modal="true" aria-label="Cheating Detected">
+    <div id="cheatBox">
+      <h3>⚠️ CHEATING DETECTED ⚠️</h3>
+      <div class="cheatMessage">
+        YOU HAVE BEEN CAUGHT CHEATING!
+      </div>
+      <p>Your score, leaderboard position, and all upgrades have been reset to ZERO.</p>
+      <p>Play fair or face the consequences!</p>
+      <button id="cheatAcknowledgeBtn">I UNDERSTAND</button>
+    </div>
+  </div>
+
+
+  <div class="mainLayout">
+    <div class="side side-left">
+      <div class="panel" id="statBoard">
+        <h2 class="retroTitle">[ STATS ]</h2>
+
+        <div class="statSection retroLevelSection">
+          <div class="statSectionTitle retroTitleBar">[ LEVEL ]</div>
+          <div class="statRow retroRow">
+            <div class="statLabel">
+              <span class="retroBullet">></span>
+              <span>LEVEL:</span>
+            </div>
+            <div class="statValue statLevel retroGlow" id="currentLevel">1</div>
+          </div>
+          <div class="statRow retroRow">
+            <div class="statLabel">
+              <span class="retroBullet">></span>
+              <span>NEXT:</span>
+            </div>
+            <div class="statValue retroCyan" id="nextLevel">0</div>
+          </div>
+          <div class="statRow retroRow">
+            <div class="statLabel">
+              <span class="retroBullet">></span>
+              <span>PROGRESS:</span>
+            </div>
+            <div class="statValue retroAmber" id="levelProgress">0%</div>
+          </div>
+          <div class="progressBarContainer retroProgress">
+            <div class="progressBar retroProgressBar" id="progressBar"></div>
+            <div class="progressScanlines"></div>
+          </div>
+        </div>
+
+        <div class="statDivider retroDivider"></div>
+
+        <div class="statSection">
+          <div class="statSectionTitle retroTitleBar">[ CLICKS ]</div>
+          <div class="statRow retroRow">
+            <div class="statLabel">
+              <span class="retroBullet">></span>
+              <span>RAW:</span>
+            </div>
+            <div class="statValue retroGreen" id="rawClicks">0</div>
+          </div>
+          <div class="statRow retroRow">
+            <div class="statLabel">
+              <span class="retroBullet">></span>
+              <span>PER CLICK:</span>
+            </div>
+            <div class="statValue retroGreen" id="statPerClick">1</div>
+          </div>
+          <div class="statRow retroRow">
+            <div class="statLabel">
+              <span class="retroBullet">></span>
+              <span>PER SEC:</span>
+            </div>
+            <div class="statValue retroGreen" id="statPerSec">0.1</div>
+          </div>
+        </div>
+
+        <div class="statDivider retroDivider"></div>
+
+        <div class="statSection">
+          <div class="statSectionTitle retroTitleBar">[ TIME ]</div>
+          <div class="statRow retroRow">
+            <div class="statLabel">
+              <span class="retroBullet">></span>
+              <span>HOURS:</span>
+            </div>
+            <div class="statValue retroAmber" id="hoursPlayed">0.00</div>
+          </div>
+          <div class="statRow retroRow">
+            <div class="statLabel">
+              <span class="retroBullet">></span>
+              <span>SESSION:</span>
+            </div>
+            <div class="statValue retroAmber" id="sessionTime">00:00:00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="centerCol">
+      <div class="wrap">
+        <div class="title">EPSTEIN CLICKER</div>
+
+        <div class="score">SCORE: <span id="score">0.0</span></div>
+
+        <div class="sub">
+          PER CLICK: <span id="perClick">1</span>
+          &nbsp;|&nbsp;
+          AUTO / SEC: <span id="perSec">0.1</span>
+          &nbsp;|&nbsp;
+          UPGRADES: <span id="upgradeCount">0</span>
+        </div>
+
+        <img id="clickBtn" alt="Click" src="https://cdn.jsdelivr.net/gh/CupcakeIdeas/CupcakeIdeas.github.io@main/cupcake47.png" />
+
+        <div class="panel">
+          <h2>UPGRADES</h2>
+          <div id="shop"></div>
+
+          <button class="danger" id="resetBtn">RESET SAVE</button>
+          <div class="footer">Auto-saves | Scaling: Cursor x1.25, others x1.40 | Shows owned count per upgrade</div>
+        </div>
+      </div>
+    </div>
+    <div class="side side-right">
+
+      <div class="panel" id="lbPanel">
+        <h2>LEADERBOARD</h2>
+
+        <div class="lbHint">
+          All players are shown. Scores sync automatically.<br>
+          To join, enter a name (8–20 chars) and click JOIN.
+        </div>
+
+        <input id="lbName" class="lbInput" placeholder="ENTER NAME (8–20 CHARS)" maxlength="20" />
+        <div style="margin-top:10px; display:flex; gap:10px; justify-content:flex-start; flex-wrap:wrap;">
+          <button id="joinBtn">JOIN</button>
+          <button id="saveBtn" disabled>SAVE SCORE</button>
+          <button id="ownerBtn">OWNER EDIT</button>
+        </div>
+        <div id="lbMsg" class="lbMsg"></div>
+
+        <div id="lbList" style="margin-top:10px; text-align:left;"></div>
+        <div class="footer">Public. No sign-in. Scores can only go up (anti-cheat enabled).</div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const SAVE_KEY = "epstein_clicker_bigint_owned_v1";
+
+    // score stored in tenths (score10 = score * 10) so +0.1 is visible
+    let score10 = 0n;
+    // Make score10 globally accessible for Firebase sync
+    window.score10 = score10;
+    let perClick = 1n;
+
+    // total upgrades purchased (across all types)
+    let upgradesOwned = 0n;
+
+    const upgrades = [
+      // early game - balanced progression
+      {
+        id: "cursor",
+        name: "Cursor",
+        cost: 1000n,
+        add: 10n,
+        owned: 0n,
+        scaleNum: 125n,
+        scaleDen: 100n,
+        initialCost: 1000n
+      },
+      {
+        id: "diddy",
+        name: "Diddy Factory",
+        cost: 8000n,
+        add: 25n,
+        owned: 0n,
+        scaleNum: 130n,
+        scaleDen: 100n,
+        initialCost: 8000n
+      },
+      {
+        id: "mega",
+        name: "Mega Factory",
+        cost: 15000n,
+        add: 50n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 15000n
+      },
+      {
+        id: "oil",
+        name: "Baby Oil Factory",
+        cost: 40000n,
+        add: 150n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 40000n
+      },
+      {
+        id: "degree",
+        name: "Epstein Degree",
+        cost: 80000n,
+        add: 400n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 80000n
+      },
+      {
+        id: "nyc",
+        name: "NYC Apartment",
+        cost: 500000n,
+        add: 2000n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 500000n
+      },
+      {
+        id: "mex",
+        name: "Mexico House",
+        cost: 3000000n,
+        add: 15000n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 3000000n
+      },
+      {
+        id: "island",
+        name: "Epstein Island",
+        cost: 15000000n,
+        add: 80000n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 15000000n
+      },
+
+      // mid game - steady scaling
+      {
+        id: "jet",
+        name: "Gulfstream Jet",
+        cost: 80000000n,
+        add: 400000n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 80000000n
+      },
+      {
+        id: "runway",
+        name: "Private Island Runway",
+        cost: 500000000n,
+        add: 2500000n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 500000000n
+      },
+      {
+        id: "shell",
+        name: "Shell Company Empire",
+        cost: 3000000000n,
+        add: 15000000n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 3000000000n
+      },
+      {
+        id: "offshore",
+        name: "Offshore Money Network",
+        cost: 20000000000n,
+        add: 100000000n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 20000000000n
+      },
+      {
+        id: "media",
+        name: "Media Control Machine",
+        cost: 150000000000n,
+        add: 750000000n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 150000000000n
+      },
+      {
+        id: "lobby",
+        name: "Global Lobbying Force",
+        cost: 1000000000000n,
+        add: 5000000000n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 1000000000000n
+      },
+      {
+        id: "access",
+        name: "Shadow Access Pass",
+        cost: 8000000000000n,
+        add: 40000000000n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 8000000000000n
+      },
+      {
+        id: "grid",
+        name: "World Influence Grid",
+        cost: 60000000000000n,
+        add: 300000000000n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 60000000000000n
+      },
+      {
+        id: "protocol",
+        name: "Reality Protocol",
+        cost: 500000000000000n,
+        add: 2500000000000n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 500000000000000n
+      },
+      {
+        id: "final",
+        name: "The Untouchable",
+        cost: 4000000000000000n,
+        add: 20000000000000n,
+        owned: 0n,
+        scaleNum: 135n,
+        scaleDen: 100n,
+        initialCost: 4000000000000000n
+      },
+
+      // late game - much more affordable (reduced costs by ~1000x)
+      {
+        id: "cabal",
+        name: "The Cabal Engine",
+        cost: 200000000000000n,
+        add: 1000000000000000n,
+        owned: 0n,
+        scaleNum: 125n,
+        scaleDen: 100n,
+        initialCost: 200000000000000n
+      },
+      {
+        id: "sing",
+        name: "Singularity Core",
+        cost: 10000000000000000n,
+        add: 50000000000000000n,
+        owned: 0n,
+        scaleNum: 125n,
+        scaleDen: 100n,
+        initialCost: 10000000000000000n
+      },
+      {
+        id: "vault",
+        name: "Black Vault Network",
+        cost: 500000000000000000n,
+        add: 2500000000000000000n,
+        owned: 0n,
+        scaleNum: 125n,
+        scaleDen: 100n,
+        initialCost: 500000000000000000n
+      },
+      {
+        id: "oracle",
+        name: "Oracle Array",
+        cost: 25000000000000000000n,
+        add: 125000000000000000000n,
+        owned: 0n,
+        scaleNum: 125n,
+        scaleDen: 100n,
+        initialCost: 25000000000000000000n
+      },
+      {
+        id: "zeit",
+        name: "Zeit Control",
+        cost: 1250000000000000000000n,
+        add: 6250000000000000000000n,
+        owned: 0n,
+        scaleNum: 125n,
+        scaleDen: 100n,
+        initialCost: 1250000000000000000000n
+      },
+      {
+        id: "rift",
+        name: "Rift Generator",
+        cost: 62500000000000000000000n,
+        add: 312500000000000000000000n,
+        owned: 0n,
+        scaleNum: 125n,
+        scaleDen: 100n,
+        initialCost: 62500000000000000000000n
+      },
+      {
+        id: "dynasty",
+        name: "Dynasty Protocol",
+        cost: 3125000000000000000000000n,
+        add: 15625000000000000000000000n,
+        owned: 0n,
+        scaleNum: 125n,
+        scaleDen: 100n,
+        initialCost: 3125000000000000000000000n
+      },
+      {
+        id: "omega",
+        name: "Omega Directive",
+        cost: 156250000000000000000000000n,
+        add: 781250000000000000000000000n,
+        owned: 0n,
+        scaleNum: 125n,
+        scaleDen: 100n,
+        initialCost: 156250000000000000000000000n
+      },
+      {
+        id: "eclipse",
+        name: "Eclipse Authority",
+        cost: 7812500000000000000000000000n,
+        add: 39062500000000000000000000000n,
+        owned: 0n,
+        scaleNum: 125n,
+        scaleDen: 100n,
+        initialCost: 7812500000000000000000000000n
+      },
+      {
+        id: "godmode",
+        name: "Godmode Override",
+        cost: 390625000000000000000000000000n,
+        add: 1953125000000000000000000000000n,
+        owned: 0n,
+        scaleNum: 125n,
+        scaleDen: 100n,
+        initialCost: 390625000000000000000000000000n
+      }
+
+    ];
+
+    // DOM
+    const scoreEl = document.getElementById("score");
+    const perClickEl = document.getElementById("perClick");
+    const perSecEl = document.getElementById("perSec");
+    const upgradeCountEl = document.getElementById("upgradeCount");
+    const shopEl = document.getElementById("shop");
+    const btn = document.getElementById("clickBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    // Stat tracking
+    const STATS_KEY = "epstein_clicker_stats_v1";
+    let rawClicks = 0;
+    let sessionStartTime = Date.now();
+    let totalPlayTime = 0; // in milliseconds
+    let firstPlayTime = null;
+
+    // Level system (1000 levels based on upgrade costs)
+    // Level progression uses cumulative score to make it challenging
+    // Based on upgrade cost scaling patterns
+    function calculateLevelRequirement(level) {
+      if (level <= 1) return 0n;
+      if (level > 1000) return calculateLevelRequirement(1000);
+
+      // Use upgrade costs as reference points
+      // First upgrade starts at 1000, scales by 1.25-1.65
+      // We'll create a challenging progression
+      const levelNum = BigInt(level);
+
+      if (level <= 50) {
+        // Early levels: 1000 * level^1.5 (moderate)
+        const base = 1000n;
+        return base * levelNum * levelNum / 50n;
+      } else if (level <= 200) {
+        // Mid-early: exponential growth
+        const base50 = calculateLevelRequirement(50);
+        const excess = levelNum - 50n;
+        return base50 + (base50 * excess * excess) / 20n;
+      } else if (level <= 500) {
+        // Mid levels: more aggressive
+        const base200 = calculateLevelRequirement(200);
+        const excess = levelNum - 200n;
+        return base200 + (base200 * excess * excess * excess) / 1000n;
+      } else if (level <= 800) {
+        // Late-mid: very aggressive
+        const base500 = calculateLevelRequirement(500);
+        const excess = levelNum - 500n;
+        return base500 + (base500 * excess * excess * excess * excess) / 100000n;
+      } else {
+        // Final levels: extremely challenging
+        const base800 = calculateLevelRequirement(800);
+        const excess = levelNum - 800n;
+        return base800 + (base800 * excess * excess * excess * excess * excess) / 10000000n;
+      }
+    }
+
+    function getCurrentLevel() {
+      // Calculate level based on total score accumulated
+      const totalScore = score10 / 10n;
+
+      // Find level based on totalScore
+      for (let lvl = 1; lvl <= 1000; lvl++) {
+        const req = calculateLevelRequirement(lvl + 1);
+        if (totalScore < req) {
+          return lvl;
+        }
+      }
+      return 1000;
+    }
+
+    function getNextLevelRequirement(currentLevel) {
+      if (currentLevel >= 1000) return 0n;
+      return calculateLevelRequirement(currentLevel + 1);
+    }
+
+    function formatLargeNumber(num) {
+      if (num < 1000n) return commaBigInt(num);
+      if (num < 1000000n) return commaBigInt(num / 1000n) + "K";
+      if (num < 1000000000n) return commaBigInt(num / 1000000n) + "M";
+      if (num < 1000000000000n) return commaBigInt(num / 1000000000n) + "B";
+      if (num < 1000000000000000n) return commaBigInt(num / 1000000000000n) + "T";
+      // For very large numbers, show in quadrillions
+      return commaBigInt(num / 1000000000000000n) + "Q";
+    }
+
+    function getLevelProgress(currentLevel) {
+      if (currentLevel >= 1000) return 100;
+      const totalScore = score10 / 10n;
+      const currentReq = calculateLevelRequirement(currentLevel);
+      const nextReq = calculateLevelRequirement(currentLevel + 1);
+      const progress = nextReq > currentReq ?
+        Number((totalScore - currentReq) * 100n / (nextReq - currentReq)) :
+        0;
+      return Math.max(0, Math.min(100, progress));
+    }
+
+    // Formatting
+    function commaBigInt(x) {
+      const s = x.toString();
+      return s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function fmtScore10(v10) {
+      const neg = v10 < 0n;
+      let v = neg ? -v10 : v10;
+      const whole = v / 10n;
+      const tenth = v % 10n;
+      return (neg ? "-" : "") + commaBigInt(whole) + "." + tenth.toString();
+    }
+
+    // perSec = perClick/10 => perSec10 (tenths/sec) == perClick
+    function fmtPerSec10(perSec10) {
+      const whole = perSec10 / 10n;
+      const tenth = perSec10 % 10n;
+      return commaBigInt(whole) + "." + tenth.toString();
+    }
+
+    // Save/Load
+    function save() {
+      // Keep global reference in sync
+      window.score10 = score10;
+
+      const upgradeCosts = {};
+      const upgradeOwned = {};
+      upgrades.forEach(u => {
+        upgradeCosts[u.id] = u.cost.toString();
+        upgradeOwned[u.id] = u.owned.toString();
+      });
+
+      localStorage.setItem(SAVE_KEY, JSON.stringify({
+        score10: score10.toString(),
+        perClick: perClick.toString(),
+        upgradesOwned: upgradesOwned.toString(),
+        upgradeCosts,
+        upgradeOwned
+      }));
+
+      // Save stats
+      const now = Date.now();
+      const sessionTime = now - sessionStartTime;
+      const statsData = {
+        rawClicks: rawClicks,
+        totalPlayTime: totalPlayTime + sessionTime,
+        firstPlayTime: firstPlayTime || now,
+        lastSessionEnd: now
+      };
+      localStorage.setItem(STATS_KEY, JSON.stringify(statsData));
+    }
+
+    (function load() {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        if (data.score10) {
+          score10 = BigInt(data.score10);
+          window.score10 = score10; // Update global reference
+        }
+        if (data.perClick) perClick = BigInt(data.perClick);
+        if (data.upgradesOwned) upgradesOwned = BigInt(data.upgradesOwned);
+
+        if (data.upgradeCosts && typeof data.upgradeCosts === "object") {
+          upgrades.forEach(u => {
+            const c = data.upgradeCosts[u.id];
+            if (typeof c === "string") u.cost = BigInt(c);
+          });
+        }
+
+        if (data.upgradeOwned && typeof data.upgradeOwned === "object") {
+          upgrades.forEach(u => {
+            const o = data.upgradeOwned[u.id];
+            if (typeof o === "string") u.owned = BigInt(o);
+          });
+        }
+      } catch (e) {}
+
+      // Load stats
+      try {
+        const statsRaw = localStorage.getItem(STATS_KEY);
+        if (statsRaw) {
+          const statsData = JSON.parse(statsRaw);
+          rawClicks = statsData.rawClicks || 0;
+          totalPlayTime = statsData.totalPlayTime || 0;
+          firstPlayTime = statsData.firstPlayTime || Date.now();
+
+          // Add time since last session end to total play time
+          if (statsData.lastSessionEnd) {
+            const timeSinceLastSession = Date.now() - statsData.lastSessionEnd;
+            // Cap at reasonable idle time (e.g., 1 hour max per session gap)
+            totalPlayTime += Math.min(timeSinceLastSession, 3600000);
+          }
+        } else {
+          firstPlayTime = Date.now();
+        }
+      } catch (e) {
+        firstPlayTime = Date.now();
+      }
+      sessionStartTime = Date.now();
+    })();
+
+    // Floating text
+    function spawnFloat(x, y, text) {
+      const el = document.createElement("div");
+      el.className = "floatText";
+      el.textContent = text;
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 750);
+    }
+
+    // Shop UI
+    let rendered = false;
+
+    function renderShop() {
+      shopEl.innerHTML = "";
+      upgrades.forEach(u => {
+        const row = document.createElement("div");
+        row.className = "row";
+
+        const left = document.createElement("div");
+        left.id = "left_" + u.id;
+
+        const b = document.createElement("button");
+        b.id = "btn_" + u.id;
+        b.textContent = "BUY";
+        b.onclick = () => buy(u.id);
+
+        row.appendChild(left);
+        row.appendChild(b);
+        shopEl.appendChild(row);
+      });
+
+      rendered = true;
+      refreshShopUI();
+    }
+
+    function refreshShopUI() {
+      upgrades.forEach(u => {
+        const left = document.getElementById("left_" + u.id);
+        const b = document.getElementById("btn_" + u.id);
+        if (!left || !b) return;
+
+        left.innerHTML =
+          `<b>${u.name}</b><br>` +
+          `Owned: x${commaBigInt(u.owned)}<br>` +
+          `+${commaBigInt(u.add)} per click<br>` +
+          `Cost: $${commaBigInt(u.cost)}`;
+
+        b.disabled = score10 < (u.cost * 10n);
+      });
+    }
+
+    // Top UI
+    function updateTopUI() {
+      scoreEl.textContent = fmtScore10(score10);
+      perClickEl.textContent = commaBigInt(perClick);
+
+      const perSec10 = perClick;
+      perSecEl.textContent = fmtPerSec10(perSec10);
+
+      upgradeCountEl.textContent = commaBigInt(upgradesOwned);
+    }
+
+    // Stat Board UI
+    function updateStatBoard() {
+      const now = Date.now();
+      const sessionTime = now - sessionStartTime;
+      const totalTime = totalPlayTime + sessionTime;
+
+      // Hours Played
+      const hoursPlayed = totalTime / (1000 * 60 * 60);
+      const hoursEl = document.getElementById("hoursPlayed");
+      if (hoursEl) hoursEl.textContent = hoursPlayed.toFixed(2);
+
+      // Session Time
+      const hours = Math.floor(sessionTime / 3600000);
+      const minutes = Math.floor((sessionTime % 3600000) / 60000);
+      const seconds = Math.floor((sessionTime % 60000) / 1000);
+      const sessionTimeEl = document.getElementById("sessionTime");
+      if (sessionTimeEl) {
+        sessionTimeEl.textContent =
+          String(hours).padStart(2, '0') + ":" +
+          String(minutes).padStart(2, '0') + ":" +
+          String(seconds).padStart(2, '0');
+      }
+
+      // Raw Clicks
+      const rawClicksEl = document.getElementById("rawClicks");
+      if (rawClicksEl) rawClicksEl.textContent = commaBigInt(BigInt(rawClicks));
+
+      // Per Click
+      const statPerClickEl = document.getElementById("statPerClick");
+      if (statPerClickEl) statPerClickEl.textContent = commaBigInt(perClick);
+
+      // Per Sec
+      const statPerSecEl = document.getElementById("statPerSec");
+      if (statPerSecEl) {
+        const perSec10 = perClick;
+        statPerSecEl.textContent = fmtPerSec10(perSec10);
+      }
+
+      // Level
+      const currentLevel = getCurrentLevel();
+      const currentLevelEl = document.getElementById("currentLevel");
+      if (currentLevelEl) currentLevelEl.textContent = currentLevel;
+
+      // Next Level
+      const nextLevelReq = getNextLevelRequirement(currentLevel);
+      const nextLevelEl = document.getElementById("nextLevel");
+      if (nextLevelEl) {
+        if (currentLevel >= 1000) {
+          nextLevelEl.textContent = "MAX";
+        } else {
+          nextLevelEl.textContent = formatLargeNumber(nextLevelReq);
+        }
+      }
+
+      // Level Progress
+      const progress = getLevelProgress(currentLevel);
+      const progressEl = document.getElementById("levelProgress");
+      if (progressEl) progressEl.textContent = progress.toFixed(1) + "%";
+
+      // Progress Bar
+      const progressBar = document.getElementById("progressBar");
+      if (progressBar) {
+        progressBar.style.width = progress + "%";
+      }
+    }
+
+    function fullUpdate() {
+      updateTopUI();
+      updateStatBoard();
+      if (!rendered) renderShop();
+      else refreshShopUI();
+      save();
+      // Sync to Firebase if available
+      if (typeof syncScoreToFirebase === "function") {
+        syncScoreToFirebase();
+      }
+    }
+
+    // Buying
+    function buy(id) {
+      const u = upgrades.find(x => x.id === id);
+      if (!u) return;
+
+      const cost10 = u.cost * 10n;
+      if (score10 < cost10) return;
+
+      score10 -= cost10;
+      window.score10 = score10; // Update global reference
+      perClick += u.add;
+
+      upgradesOwned += 1n;
+      u.owned += 1n;
+
+      u.cost = (u.cost * u.scaleNum) / u.scaleDen;
+
+      fullUpdate();
+    }
+
+
+    /* ===== Idle + Anti-cheat (client-side) ===== */
+    window.__gamePaused = false;
+    window.__pauseReason = "";
+
+    window.__cheatFlag = false;
+    window.__cheatReason = "";
+
+    window.__flagCheat = function(reason) {
+      // Always set the flag and reason (don't return early - allow repeated detection)
+      window.__cheatFlag = true;
+      window.__cheatReason = String(reason || "suspicious activity");
+
+      // Reset suspicion score and timer so it can detect again if they continue cheating
+      if (typeof __suspicionScore !== "undefined") {
+        __suspicionScore = 0;
+      }
+      if (typeof __suspiciousBehaviorStartTime !== "undefined") {
+        __suspiciousBehaviorStartTime = null;
+      }
+
+      // Log for debugging
+      console.warn("Anti-cheat triggered:", reason);
+
+      // Penalty: reset EVERYTHING if cheating is detected (works repeatedly)
+      try {
+        // Reset score
+        if (typeof score10 !== "undefined") {
+          score10 = 0n;
+          window.score10 = 0n;
+        }
+        if (typeof autoCarry !== "undefined") autoCarry = 0n;
+
+        // Reset ALL upgrades to 0 and reset their costs
+        if (typeof upgrades !== "undefined" && Array.isArray(upgrades)) {
+          upgrades.forEach(u => {
+            u.owned = 0n;
+            // Reset cost to initial value using initialCost property
+            if (u.initialCost !== undefined) {
+              u.cost = u.initialCost;
+            }
+          });
+        }
+
+        // Reset upgrades owned count
+        if (typeof upgradesOwned !== "undefined") {
+          upgradesOwned = 0n;
+        }
+
+        // Reset per-click to base value
+        if (typeof perClick !== "undefined") {
+          perClick = 10n; // base value
+        }
+
+        // Reset leaderboard score in Firebase
+        try {
+          if (typeof db !== "undefined" && typeof deviceId !== "undefined") {
+            const ref = db.collection("leaderboard").doc(deviceId);
+            ref.get().then(snap => {
+              if (snap.exists) {
+                ref.update({
+                  score: 0,
+                  updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch(e => console.error("Leaderboard reset failed:", e));
+              }
+            }).catch(e => console.error("Leaderboard reset check failed:", e));
+          }
+        } catch (e) {
+          console.error("Firebase reset error:", e);
+        }
+
+        // Clear localStorage to prevent cheating via save manipulation
+        try {
+          localStorage.removeItem(SAVE_KEY);
+          localStorage.removeItem(STATS_KEY);
+        } catch (e) {}
+
+        // Update UI
+        if (typeof fullUpdate === "function") fullUpdate();
+
+        // Show big popup (will show each time cheating is detected)
+        const cheatOverlay = document.getElementById("cheatOverlay");
+        if (cheatOverlay) {
+          cheatOverlay.style.display = "flex";
+        }
+      } catch (e) {
+        console.error("Cheat reset error:", e);
+      }
+      try {
+        const s = document.getElementById("score");
+        if (s) s.style.textShadow = "0 0 12px rgba(255,59,48,.65)";
+      } catch (e) {}
+    };
+
+    function __setPaused(p, reason) {
+      window.__gamePaused = !!p;
+      window.__pauseReason = String(reason || (p ? "paused" : ""));
+      const ov = document.getElementById("idleOverlay");
+      if (ov) {
+        ov.style.display = window.__gamePaused ? "flex" : "none";
+      }
+    }
+
+    const __IDLE_MS = 20 * 60 * 1000;
+    let __lastActive = Date.now();
+
+    window.__noteActivity = function() {
+      __lastActive = Date.now();
+    };
+
+    function __idleTick() {
+      const now = Date.now();
+      const idleFor = now - __lastActive;
+      if (idleFor >= __IDLE_MS && !window.__gamePaused) {
+        __setPaused(true, "inactive 20 minutes");
+      }
+    }
+
+    ["pointerdown", "mousedown", "keydown", "touchstart"].forEach(ev => {
+      window.addEventListener(ev, (e) => {
+        if (e && e.isTrusted) window.__noteActivity();
+      }, {
+        passive: true
+      });
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        __setPaused(true, "tab hidden");
+      }
+    });
+
+    setInterval(__idleTick, 1000);
+
+    (function() {
+      const b = document.getElementById("idleResumeBtn");
+      if (b) {
+        b.addEventListener("click", (e) => {
+          if (e && e.isTrusted) {
+            window.__noteActivity();
+            __setPaused(false, "");
+          }
+        });
+      }
+    })();
+
+    // Cheat acknowledge button handler
+    (function() {
+      const b = document.getElementById("cheatAcknowledgeBtn");
+      if (b) {
+        b.addEventListener("click", (e) => {
+          if (e && e.isTrusted) {
+            const cheatOverlay = document.getElementById("cheatOverlay");
+            if (cheatOverlay) {
+              cheatOverlay.style.display = "none";
+            }
+          }
+        });
+      }
+    })();
+
+    // Enhanced anti-cheat tracking
+    let __clickTimes = [];
+    let __clickPositions = [];
+    let __clickIntervals = [];
+    let __mouseMovements = [];
+    let __lastClickTime = 0;
+    let __lastMouseMove = Date.now();
+    let __suspicionScore = 0;
+    let __suspiciousBehaviorStartTime = null; // Track when suspicious behavior started
+    const __REQUIRED_SUSPICIOUS_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+    // Track mouse movement
+    document.addEventListener("mousemove", (e) => {
+      if (e && e.isTrusted) {
+        __lastMouseMove = Date.now();
+        __mouseMovements.push({
+          time: Date.now(),
+          x: e.clientX,
+          y: e.clientY
+        });
+        // Keep only last 50 movements
+        if (__mouseMovements.length > 50) __mouseMovements.shift();
+      }
+    }, {
+      passive: true
+    });
+
+    window.__noteTrustedClick = function(x, y) {
+      const t = performance.now();
+      const now = Date.now();
+
+      // Store click data
+      __clickTimes.push(t);
+      if (x !== undefined && y !== undefined) {
+        __clickPositions.push({
+          x,
+          y,
+          time: t
+        });
+      }
+
+      // Calculate interval since last click
+      if (__lastClickTime > 0) {
+        const interval = t - __lastClickTime;
+        __clickIntervals.push(interval);
+        if (__clickIntervals.length > 100) __clickIntervals.shift();
+      }
+      __lastClickTime = t;
+
+      // Clean old data (keep last 5 minutes for analysis)
+      const cutoff = t - (5 * 60 * 1000);
+      while (__clickTimes.length && __clickTimes[0] < cutoff) __clickTimes.shift();
+      while (__clickPositions.length && __clickPositions[0].time < cutoff) __clickPositions.shift();
+      while (__clickIntervals.length > 500) __clickIntervals.shift();
+
+      // Check for sustained suspicious behavior over 5+ minutes
+      let isCurrentlySuspicious = false;
+      let suspiciousReasons = [];
+
+      // Detection 1: Click rate (much higher threshold - need sustained high rate)
+      const cutoff2 = t - 10000; // Check last 10 seconds
+      let recent2 = 0;
+      for (const x of __clickTimes)
+        if (x >= cutoff2) recent2++;
+      const cps = recent2 / 10; // clicks per second over 10 second window
+
+      // Only suspicious if consistently above 25 clicks/sec for extended period
+      if (cps > 25) {
+        isCurrentlySuspicious = true;
+        suspiciousReasons.push("high click rate: " + cps.toFixed(1) + "/sec");
+      }
+
+      // Detection 2: Perfect timing patterns (require more samples and stricter criteria)
+      if (__clickIntervals.length >= 200) { // Need 200+ intervals (much more data)
+        const recent = __clickIntervals.slice(-200); // Analyze last 200 clicks
+        const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
+        const variance = recent.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / recent.length;
+        const std = Math.sqrt(variance);
+        const cv = std / avg; // Coefficient of variation
+
+        // Much stricter: CV < 0.02 (less than 2% variation) AND very fast clicking
+        if (avg < 100 && cv < 0.02 && avg > 0) {
+          isCurrentlySuspicious = true;
+          suspiciousReasons.push("machine-like timing (CV: " + cv.toFixed(4) + ")");
+        }
+
+        // Detection 3: Too consistent intervals (extremely strict)
+        if (avg < 150 && std < 0.5 && avg > 0) { // std < 0.5ms is extremely consistent
+          isCurrentlySuspicious = true;
+          suspiciousReasons.push("perfect timing consistency");
+        }
+      }
+
+      // Detection 4: Click position analysis (require more samples)
+      if (__clickPositions.length >= 100) { // Need 100+ position samples
+        const recent = __clickPositions.slice(-100);
+        const xs = recent.map(p => p.x);
+        const ys = recent.map(p => p.y);
+
+        const avgX = xs.reduce((a, b) => a + b, 0) / xs.length;
+        const avgY = ys.reduce((a, b) => a + b, 0) / ys.length;
+
+        const varianceX = xs.reduce((a, b) => a + Math.pow(b - avgX, 2), 0) / xs.length;
+        const varianceY = ys.reduce((a, b) => a + Math.pow(b - avgY, 2), 0) / ys.length;
+        const stdX = Math.sqrt(varianceX);
+        const stdY = Math.sqrt(varianceY);
+
+        // Much stricter: clicks within 1 pixel (extremely precise)
+        if (stdX < 1 && stdY < 1) {
+          isCurrentlySuspicious = true;
+          suspiciousReasons.push("identical click positions");
+        }
+      }
+
+      // Detection 5: No mouse movement (require much longer period)
+      const timeSinceMouseMove = now - __lastMouseMove;
+      if (__clickTimes.length >= 500 && timeSinceMouseMove > 300000) { // 5 minutes of no movement
+        isCurrentlySuspicious = true;
+        suspiciousReasons.push("no mouse movement for 5+ minutes");
+      }
+
+      // Detection 6: Human timing patterns (require more identical intervals)
+      if (__clickIntervals.length >= 300) {
+        const recent = __clickIntervals.slice(-300);
+        let identicalCount = 0;
+        for (let i = 1; i < recent.length; i++) {
+          if (Math.abs(recent[i] - recent[i - 1]) < 0.5) identicalCount++; // Within 0.5ms
+        }
+        // Require 80%+ identical (extremely consistent)
+        if (identicalCount > recent.length * 0.8) {
+          isCurrentlySuspicious = true;
+          suspiciousReasons.push("unnatural timing consistency");
+        }
+      }
+
+      // Check if suspicious behavior is sustained
+      if (isCurrentlySuspicious) {
+        // Start tracking suspicious behavior time
+        if (__suspiciousBehaviorStartTime === null) {
+          __suspiciousBehaviorStartTime = now;
+        }
+
+        // Check if suspicious behavior has been sustained for 5+ minutes
+        const suspiciousDuration = now - __suspiciousBehaviorStartTime;
+        if (suspiciousDuration >= __REQUIRED_SUSPICIOUS_TIME) {
+          // They've been suspicious for 5+ minutes straight - flag as cheating
+          const reason = suspiciousReasons.join(", ");
+          window.__flagCheat("sustained suspicious behavior for " + Math.floor(suspiciousDuration / 1000) + " seconds: " + reason);
+          return;
+        }
+      } else {
+        // Not currently suspicious - reset the timer
+        __suspiciousBehaviorStartTime = null;
+      }
+
+      // Gradually reduce suspicion score over time (if not currently suspicious)
+      if (__suspicionScore > 0 && !isCurrentlySuspicious) {
+        __suspicionScore = Math.max(0, __suspicionScore - 0.2);
+      }
+    };
+
+    window.__canSubmitLeaderboard = function() {
+      if (window.__gamePaused) return {
+        ok: false,
+        msg: "Paused: click I'M BACK to resume."
+      };
+      if (window.__cheatFlag) return {
+        ok: false,
+        msg: "Anti-cheat: " + (window.__cheatReason || "flagged")
+      };
+      if (document.hidden) return {
+        ok: false,
+        msg: "Anti-cheat: tab must be visible."
+      };
+
+      // Additional checks
+      if (__suspicionScore >= 8) {
+        return {
+          ok: false,
+          msg: "Anti-cheat: suspicious activity detected"
+        };
+      }
+
+      // Check for automation tools
+      if (navigator.webdriver === true) {
+        return {
+          ok: false,
+          msg: "Anti-cheat: automation detected"
+        };
+      }
+
+      return {
+        ok: true,
+        msg: ""
+      };
+    };
+
+    // Periodic check for automation indicators
+    setInterval(() => {
+      // Check for common automation indicators
+      if (navigator.webdriver === true) {
+        window.__flagCheat("webdriver automation detected");
+      }
+
+      // Check for headless browser indicators
+      if (navigator.plugins.length === 0 && navigator.languages.length === 0) {
+        __suspicionScore += 2;
+      }
+
+      // Check if window properties are missing (some automation tools)
+      if (!window.chrome && !window.safari && navigator.userAgent.includes("Headless")) {
+        window.__flagCheat("headless browser detected");
+      }
+    }, 5000);
+
+
+    // Clicking with enhanced validation
+    btn.addEventListener("click", (e) => {
+      if (window.__gamePaused) return;
+      if (!e || !e.isTrusted) {
+        window.__flagCheat("scripted click");
+        return;
+      }
+
+      // Additional checks for synthetic events
+      if (e.detail === 0 && e.isTrusted === false) {
+        window.__flagCheat("synthetic click event");
+        return;
+      }
+
+      // Check for missing mouse properties (some auto-clickers don't set these)
+      if (e.type === "click" && (e.clientX === undefined || e.clientY === undefined)) {
+        window.__flagCheat("invalid click event");
+        return;
+      }
+
+      // Check for programmatic clicks (no user interaction)
+      if (e.detail === 0 && !e.isTrusted) {
+        window.__flagCheat("programmatic click");
+        return;
+      }
+
+      // Validate event has proper mouse coordinates
+      const rect = btn.getBoundingClientRect();
+      if (e.clientX < rect.left || e.clientX > rect.right ||
+        e.clientY < rect.top || e.clientY > rect.bottom) {
+        // Click outside button bounds but still triggered - suspicious
+        __suspicionScore += 2;
+      }
+
+      window.__noteActivity();
+      window.__noteTrustedClick(e.clientX, e.clientY);
+
+      rawClicks++;
+      score10 += perClick * 10n;
+      window.score10 = score10; // Update global reference
+      spawnFloat(e.clientX, e.clientY, "+" + commaBigInt(perClick));
+      fullUpdate();
+    }, {
+      capture: true
+    });
+
+    // Also listen on mousedown for better detection
+    btn.addEventListener("mousedown", (e) => {
+      if (!e || !e.isTrusted) return;
+      // Track mouse down events for pattern analysis
+      window.__noteActivity();
+    }, {
+      passive: true
+    });
+
+    // Auto: exact rule auto/sec = perClick/10
+    const TICKS_PER_SEC = 20n;
+    let autoCarry = 0n;
+
+    setInterval(() => {
+      if (window.__gamePaused || document.hidden) return;
+      autoCarry += perClick; // perSec10
+      const addNow = autoCarry / TICKS_PER_SEC; // tenths to add now
+      autoCarry = autoCarry % TICKS_PER_SEC;
+
+      if (addNow > 0n) {
+        score10 += addNow;
+        window.score10 = score10; // Update global reference
+      }
+      updateTopUI();
+      updateStatBoard();
+    }, 50);
+
+    // Floating auto animation once per second (no button movement)
+    setInterval(() => {
+      if (window.__gamePaused || document.hidden) return;
+      const perSec10 = perClick;
+      const r = btn.getBoundingClientRect();
+      spawnFloat(r.left + r.width / 2, r.top + 18, "+" + fmtPerSec10(perSec10));
+    }, 1000);
+
+    // Refresh shop buttons + save
+    setInterval(() => {
+      if (rendered) refreshShopUI();
+      save();
+      // Sync to Firebase periodically
+      if (typeof syncScoreToFirebase === "function") {
+        syncScoreToFirebase();
+      }
+    }, 500);
+
+    // Reset
+    resetBtn.addEventListener("click", () => {
+      localStorage.removeItem(SAVE_KEY);
+      localStorage.removeItem(STATS_KEY);
+      location.reload();
+    });
+
+    // Init
+    fullUpdate();
+  </script>
+
+  <script>
+    /* ===== No abbreviations + auto-fit score text ===== */
+    (function() {
+      const scoreEl = document.getElementById("score");
+      if (!scoreEl) return;
+
+      function fit() {
+        const t = (scoreEl.textContent || "").trim();
+        const len = t.length;
+
+        let px = 18;
+        if (len <= 10) px = 18;
+        else if (len <= 14) px = 16;
+        else if (len <= 18) px = 14;
+        else if (len <= 22) px = 12;
+        else px = 10;
+
+        scoreEl.style.fontSize = px + "px";
+      }
+
+      setInterval(fit, 150);
+      fit();
+    })();
+  </script>
+
+  <script>
+    /* ========= Firebase Top 10 Leaderboard (no sign-in) =========
+   - Uses TRUE points from score10 (BigInt) instead of parsing the UI text
+   - Allows name changes (if your Firestore rules allow it)
+   - NO abbreviations (shows full numbers; font/ellipsis handles long values)
+*/
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmdKfNp-9_I12DUxBP3ueFVWtk6cZIkio",
+      authDomain: "epsteinclicker.firebaseapp.com",
+      projectId: "epsteinclicker",
+      storageBucket: "epsteinclicker.firebasestorage.app",
+      messagingSenderId: "283677573494",
+      appId: "1:283677573494:web:4d890064f1dcbd2ec63a57",
+      measurementId: "G-MVXGJXLC3C"
+    };
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+    } catch (e) {
+      // ignore "already exists"
+    }
+    const db = firebase.firestore();
+
+    function getDeviceId() {
+      let id = localStorage.getItem("lb_deviceId");
+      if (!id) {
+        id = crypto.getRandomValues(new Uint8Array(16))
+          .reduce((s, b) => s + b.toString(16).padStart(2, '0'), '');
+        localStorage.setItem("lb_deviceId", id);
+      }
+      return id;
+    }
+    const deviceId = getDeviceId();
+
+    const lbName = document.getElementById("lbName");
+    const joinBtn = document.getElementById("joinBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const ownerBtn = document.getElementById("ownerBtn");
+    const lbMsg = document.getElementById("lbMsg");
+    const lbList = document.getElementById("lbList");
+
+    const ownerSecret = "epstein-owner";
+    const ownerKey = "lb_ownerMode";
+    let ownerMode = localStorage.getItem(ownerKey) === "1";
+    let lastLeaderboardSnapshot = null;
+    const leaderboardCache = new Map();
+
+    function setOwnerMode(enabled) {
+      ownerMode = !!enabled;
+      localStorage.setItem(ownerKey, ownerMode ? "1" : "0");
+      ownerBtn.textContent = ownerMode ? "OWNER EDIT ✓" : "OWNER EDIT";
+      setMsg(ownerMode ? "Owner edit enabled. Use the row buttons to edit or delete entries." : "Owner edit disabled.");
+      if (lastLeaderboardSnapshot) renderLeaderboard(lastLeaderboardSnapshot);
+    }
+
+    function promptOwnerMode() {
+      if (ownerMode) {
+        setOwnerMode(false);
+        return;
+      }
+      const code = prompt("Enter owner code to edit leaderboard:");
+      if (code === null) return;
+      if (code === ownerSecret) {
+        setOwnerMode(true);
+      } else {
+        alert("Invalid owner code.");
+      }
+    }
+
+    function setMsg(t) {
+      lbMsg.textContent = t || "";
+    }
+
+    function renderLeaderboard(snap) {
+      lastLeaderboardSnapshot = snap;
+      leaderboardCache.clear();
+      let out = "";
+      let rank = 1;
+      snap.forEach((docx) => {
+        const d = docx.data() || {};
+        const rawName = String(d.name || "");
+        const name = rawName.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        const sc = Number(d.score || 0);
+        const isMe = docx.id === deviceId;
+        leaderboardCache.set(docx.id, { name: rawName, score: sc });
+
+        out += `
+        <div class="row" style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.08);">
+          <div style="width:28px;">#${rank}</div>
+          <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; ${isMe ? "text-shadow:0 0 10px rgba(0,255,90,.7);" : ""}">
+            ${name}${isMe ? " (YOU)" : ""}
+          </div>
+          ${scoreCellHtml(sc)}
+          ${ownerMode ? `<button type="button" class="lbActionBtn" data-action="edit" data-id="${docx.id}">Edit</button><button type="button" class="lbActionBtn" data-action="delete" data-id="${docx.id}">Delete</button>` : ""}
+        </div>
+      `;
+        rank++;
+      });
+      lbList.innerHTML = out || "<div style='opacity:.8'>No scores yet.</div>";
+    }
+
+    function normalizeName(n) {
+      return (n || "").trim().replace(/\s+/g, " ");
+    }
+
+    function canUseName(n) {
+      n = normalizeName(n);
+      return n.length >= 8 && n.length <= 20;
+    }
+
+    const nameKey = "lb_name";
+    let playerName = localStorage.getItem(nameKey) || "";
+
+    // --- Convert BigInt points to a Firestore NUMBER (double) safely-ish.
+    // Firestore stores a double; for huge BigInt we approximate so it still increases.
+    function bigIntToDoubleApprox(bi) {
+      if (bi <= 0n) return 0;
+      const s = bi.toString();
+      if (s.length <= 15) return Number(s); // exact
+      // Take first 16 digits and scale by 10^(len-16)
+      const lead = s.slice(0, 16);
+      const exp = s.length - 16;
+      let x = Number(lead) * Math.pow(10, exp);
+      // cap to max finite double (approx)
+      if (!Number.isFinite(x)) x = Number.MAX_VALUE;
+      return x;
+    }
+
+    function getPointsNumber() {
+      // score10 is defined in the main game script (BigInt tenths)
+      try {
+        if (typeof score10 === "bigint") {
+          const whole = score10 / 10n; // integer points
+          return bigIntToDoubleApprox(whole);
+        }
+      } catch (e) {}
+      // fallback: try localStorage key used by game (if you ever change it)
+      return 0;
+    }
+
+    function fmtInt(n) {
+      if (!Number.isFinite(n) || n <= 0) return "0";
+      // Use locale formatting when possible
+      if (n < 1e21) return Math.floor(n).toLocaleString("en-US");
+      // Past this, JS will go scientific no matter what; keep it readable
+      return n.toExponential(2).replace("+", "");
+    }
+
+    function scoreCellHtml(sc) {
+      const txt = fmtInt(sc);
+      // shrink font for long strings, and ellipsis if needed
+      let px = 12;
+      const len = txt.length;
+      if (len <= 10) px = 12;
+      else if (len <= 14) px = 11;
+      else if (len <= 18) px = 10;
+      else px = 9;
+      return `<div style="min-width:84px; max-width:140px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:${px}px;">${txt}</div>`;
+    }
+
+    async function joinOrChangeName() {
+      const gate = (window.__canSubmitLeaderboard ? window.__canSubmitLeaderboard() : {
+        ok: true,
+        msg: ""
+      });
+      if (!gate.ok) {
+        setMsg(gate.msg);
+        return;
+      }
+      const n = normalizeName(lbName.value);
+      if (!canUseName(n)) {
+        setMsg("Name must be 8–20 characters.");
+        return;
+      }
+
+      try {
+        const ref = db.collection("leaderboard").doc(deviceId);
+        const snap = await ref.get();
+        const pts = getPointsNumber();
+
+        if (!snap.exists) {
+          // CREATE must match your rules: keys and types
+          await ref.set({
+            deviceId,
+            name: n,
+            score: pts,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          setMsg("Joined! You can now SAVE SCORE.");
+        } else {
+          // UPDATE: allow name change + score only up
+          await db.runTransaction(async (tx) => {
+            const s2 = await tx.get(ref);
+            if (!s2.exists) throw new Error("Missing doc");
+            const old = Number(s2.data().score || 0);
+            const next = Math.max(old, pts);
+
+            tx.update(ref, {
+              name: n,
+              score: next,
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          });
+          setMsg("Name updated.");
+        }
+
+        playerName = n;
+        localStorage.setItem(nameKey, playerName);
+
+        // Keep name editable so you can change it anytime.
+        joinBtn.textContent = "CHANGE NAME";
+        saveBtn.disabled = false;
+      } catch (e) {
+        console.error(e);
+        setMsg("Join/Name change failed. Check Firestore rules.");
+      }
+    }
+
+    async function saveScore() {
+      const gate = (window.__canSubmitLeaderboard ? window.__canSubmitLeaderboard() : {
+        ok: true,
+        msg: ""
+      });
+      if (!gate.ok) {
+        setMsg(gate.msg);
+        return;
+      }
+      if (!playerName) {
+        setMsg("Join first.");
+        return;
+      }
+      const pts = getPointsNumber();
+      try {
+        const ref = db.collection("leaderboard").doc(deviceId);
+        await db.runTransaction(async (tx) => {
+          const snap = await tx.get(ref);
+          if (!snap.exists) throw new Error("Not joined");
+          // Always update to current score (bidirectional sync)
+          tx.update(ref, {
+            score: pts,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        });
+        setMsg("Saved score: " + fmtInt(pts));
+      } catch (e) {
+        console.error(e);
+        setMsg("Save failed. Check rules.");
+      }
+    }
+
+    // Auto-sync game score to Firebase when it changes
+    let lastSyncedScore = 0n;
+
+    function syncScoreToFirebase() {
+      if (!playerName || isUpdatingFromFirebase) return;
+
+      // Access score10 from window or try to get it from the game script
+      const currentScore10 = window.score10 !== undefined ? window.score10 : (typeof score10 !== "undefined" ? score10 : 0n);
+      const currentScore = currentScore10 / 10n;
+
+      if (currentScore !== lastSyncedScore && currentScore > 0n) {
+        lastSyncedScore = currentScore;
+        const pts = bigIntToDoubleApprox(currentScore);
+
+        // Update Firebase asynchronously (don't block)
+        const ref = db.collection("leaderboard").doc(deviceId);
+        ref.get().then(snap => {
+          if (snap.exists) {
+            ref.update({
+              score: pts,
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(e => console.error("Auto-sync failed:", e));
+          }
+        }).catch(e => console.error("Auto-sync check failed:", e));
+      }
+    }
+
+    async function deleteLeaderboardEntry(docId) {
+      if (!confirm("Delete this leaderboard entry permanently?")) return;
+      try {
+        await db.collection("leaderboard").doc(docId).delete();
+        setMsg("Entry deleted.");
+      } catch (e) {
+        console.error(e);
+        setMsg("Delete failed.");
+      }
+    }
+
+    async function editLeaderboardEntry(docId) {
+      const entry = leaderboardCache.get(docId);
+      if (!entry) return;
+      const rawName = entry.name;
+      const currentScore = entry.score;
+
+      const newName = prompt("Edit player name:", rawName);
+      if (newName === null) return;
+      const normalized = normalizeName(newName);
+      if (!canUseName(normalized)) {
+        alert("Name must be 8–20 characters.");
+        return;
+      }
+
+      const newScoreStr = prompt("Edit player XP (whole number):", String(Math.floor(currentScore)));
+      if (newScoreStr === null) return;
+      const newScore = parseInt(newScoreStr.replace(/,/g, ""), 10);
+      if (!Number.isFinite(newScore) || newScore < 0) {
+        alert("Score must be a whole number 0 or greater.");
+        return;
+      }
+
+      try {
+        await db.collection("leaderboard").doc(docId).update({
+          name: normalized,
+          score: newScore,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        setMsg("Entry updated.");
+      } catch (e) {
+        console.error(e);
+        setMsg("Update failed.");
+      }
+    }
+
+    joinBtn.addEventListener("click", joinOrChangeName);
+    saveBtn.addEventListener("click", saveScore);
+    ownerBtn.addEventListener("click", promptOwnerMode);
+    setOwnerMode(ownerMode);
+
+    lbList.addEventListener("click", async (event) => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      const action = button.dataset.action;
+      const docId = button.dataset.id;
+      if (!docId) return;
+      if (action === "delete") {
+        await deleteLeaderboardEntry(docId);
+      } else if (action === "edit") {
+        await editLeaderboardEntry(docId);
+      }
+    });
+
+    // If already joined locally, enable buttons
+    if (playerName) {
+      lbName.value = playerName;
+      joinBtn.textContent = "CHANGE NAME";
+      saveBtn.disabled = false;
+      setMsg("Joined as: " + playerName);
+    } else {
+      setMsg("Enter a name (8–20 chars) and JOIN.");
+    }
+
+    // Show all players (no limit)
+    let isUpdatingFromFirebase = false; // Prevent sync loops
+
+    db.collection("leaderboard")
+      .orderBy("score", "desc")
+      .onSnapshot((snap) => {
+        renderLeaderboard(snap);
+      });
+  </script>
+
+  <script>
+    // Keep ticker score live + constant
+    (function() {
+      function syncTicker() {
+        const scoreEl = document.getElementById('score');
+        if (!scoreEl) return;
+        const v = (scoreEl.textContent || '0');
+        document.querySelectorAll('.tickerScore').forEach(el => {
+          el.textContent = v;
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          syncTicker();
+          setInterval(syncTicker, 200);
+        });
+      } else {
+        syncTicker();
+        setInterval(syncTicker, 200);
+      }
+    })();
+  </script>
+
+  <script>
+    // Leave warning
+    window.onbeforeunload = () => "Are you sure you want to leave? Your session may be interrupted.";
+
+    // Static Menu show/hide with 3 minute return
+    (function(){
+      const menu = document.getElementById("staticMenu");
+      const btn  = document.getElementById("closeStaticMenu");
+      const KEY  = "sq931_staticMenu_hidden_until";
+      const show = () => { if (menu) menu.style.display = "flex"; };
+      const hideFor3m = () => {
+        if (!menu) return;
+        menu.style.display = "none";
+        const until = Date.now() + 180000;
+        localStorage.setItem(KEY, String(until));
+        setTimeout(show, 180000);
+      };
+      const until = parseInt(localStorage.getItem(KEY)||"0", 10);
+      if (until && Date.now() < until){
+        if (menu) menu.style.display = "none";
+        setTimeout(show, until - Date.now());
+      } else {
+        show();
+      }
+      if (btn) btn.onclick = hideFor3m;
+    })();
+
+    // Rotator: Google Form → Discord → Instagram
+    (function(){
+      const wrap = document.getElementById("staticSlideMenu");
+      const a    = document.getElementById("staticSlideLink");
+      const img  = document.getElementById("staticSlideImg");
+
+      const FORM = {
+        src:  "https://cdn.jsdelivr.net/gh/StaticQuasar931/Images@main/GoogleForm.png",
+        alt:  "StaticQuasar931 Google Form for feedback and requests",
+        link: "https://sites.google.com/view/staticquasar931/google-form"
+      };
+      const DISCORD = {
+        src:  "https://cdn.jsdelivr.net/gh/StaticQuasar931/Images@main/Join_Our_DC_StaticQuassar931_lcplrf.png",
+        alt:  "Join the StaticQuasar931 Discord",
+        link: "https://discord.gg/DP2hM7RRhR"
+      };
+      const INSTA = {
+        src:  "https://cdn.jsdelivr.net/gh/StaticQuasar931/Images@main/Follow-us--IG",
+        alt:  "StaticQuasar931 Instagram",
+        link: "https://www.instagram.com/freeschoolgamepage/"
+      };
+      const ROTATION = [FORM, DISCORD, INSTA];
+
+      ROTATION.forEach(o => { const p = new Image(); p.src = o.src; });
+
+      const T_IN = 2000, T_SHOW = 5000, T_OUT = 2000, T_HIDDEN = 20000;
+      let idx = 0;
+
+      function apply(state){
+        a.href = state.link;
+        img.alt = state.alt;
+        img.style.opacity = "0";
+        setTimeout(() => { img.src = state.src; }, 80);
+        img.onload = () => { img.style.opacity = "1"; };
+      }
+      function delay(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+      (async function cycle(){
+        for(;;){
+          apply(ROTATION[idx]);
+          wrap.style.pointerEvents = "auto";
+          wrap.classList.remove("slide-out");
+          wrap.classList.add("slide-in");
+          await delay(T_IN + T_SHOW);
+          wrap.classList.remove("slide-in");
+          wrap.classList.add("slide-out");
+          await delay(T_OUT);
+          wrap.style.pointerEvents = "none";
+          await delay(T_HIDDEN);
+          idx = (idx + 1) % ROTATION.length;
+        }
+      })();
+    })();
+
+    // Keyboard toggle: y + u + i toggles both Visual SEO elements
+    (function(){
+      const idsToToggle = ["staticMenu", "staticSlideMenu"];
+      let seq = [];
+      const target = ["y","u","i"];
+      function toggle(){
+        idsToToggle.forEach(id=>{
+          const el = document.getElementById(id);
+          if(!el) return;
+          const isHidden = (el.style.display === "none" || getComputedStyle(el).display === "none");
+          el.style.display = isHidden ? (id === "staticMenu" ? "flex" : "block") : "none";
+        });
+      }
+      window.addEventListener("keydown", (e)=>{
+        seq.push(e.key.toLowerCase());
+        if (seq.length > 3) seq.shift();
+        if (seq.join("") === target.join("")) toggle();
+      });
+    })();
+  </script>
+
+</body>
+</html>

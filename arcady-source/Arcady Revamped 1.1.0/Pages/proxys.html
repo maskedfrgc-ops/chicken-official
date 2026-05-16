@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Arcady - Proxys</title>
+  <link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/arcady-web/arcady-web.github.io@main/favicon/checking-you-out-blue-emoji-blue.png">
+  <link rel="shortcut icon" type="image/png" href="https://cdn.jsdelivr.net/gh/arcady-web/arcady-web.github.io@main/favicon/checking-you-out-blue-emoji-blue.png">
+  <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/arcady-web/arcady-web.github.io@main/favicon/checking-you-out-blue-emoji-blue.png">
+  <script src="../shared-favicon.js?v=1" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <nav class="glass" id="nav-bar" role="navigation" aria-label="Primary">
+    <div class="nav-links" role="menubar">
+      <a href="../index.html" role="menuitem" aria-label="Home"><i data-lucide="home"></i></a>
+      <a href="games.html" role="menuitem" aria-label="Games"><i data-lucide="gamepad-2"></i></a>
+      <a href="proxys.html" role="menuitem" aria-label="Proxys"><i data-lucide="layout-grid"></i></a>
+      <a href="websites.html" role="menuitem" aria-label="Websites"><i data-lucide="globe"></i></a>
+      <a href="chat.html" role="menuitem" aria-label="Chat"><i data-lucide="message-circle"></i></a>
+      <a href="chatgpt.html" role="menuitem" aria-label="AI"><i data-lucide="brain"></i></a>
+      <button id="settings-btn" aria-label="Settings"><i data-lucide="settings"></i></button>
+    </div>
+  </nav>
+
+  <div id="settings-panel" class="glass">
+    <label for="bg-color">Background Color:</label>
+    <input type="color" id="bg-color" value="#87CEEB">
+
+    <label for="font-color">Font Color:</label>
+    <input type="color" id="font-color" value="#000000">
+
+    <label for="font-style">Font Style:</label>
+    <select id="font-style">
+      <option value="'Fredoka', sans-serif">Fredoka</option>
+      <option value="'Roboto', sans-serif">Roboto</option>
+      <option value="'Playfair Display', serif">Playfair Display</option>
+    </select>
+
+    <label for="bg-image">Background Image:</label>
+    <input type="file" id="bg-image" accept="image/*">
+
+    <button id="open-about-blank">Open in about:blank</button>
+
+    <label for="tab-title">Tab Cloak Title:</label>
+    <input type="text" id="tab-title" placeholder="e.g., Google Classroom">
+
+    <label for="tab-favicon">Tab Cloak Favicon URL:</label>
+    <input type="text" id="tab-favicon" placeholder="https://.../favicon.ico">
+    <button id="apply-cloak">Apply Tab Cloak</button>
+
+    <label>Font Glow:</label>
+    <input type="checkbox" id="font-glow">
+
+    <label for="nav-position">Nav Position:</label>
+    <select id="nav-position">
+      <option value="top-center">Top Center</option>
+      <option value="bottom-center">Bottom Center</option>
+      <option value="left">Left Side</option>
+      <option value="right">Right Side</option>
+    </select>
+
+    <button id="reset-settings">Reset All Settings</button>
+  </div>
+
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <section class="title-bar glass page-title-panel">
+    <img src="https://i.pinimg.com/1200x/3f/f9/8b/3ff98b503436b3c69b15e6051c8b1fa8.jpg" alt="Arcady Logo" class="page-title-image">
+    <div class="page-title-copy">
+      <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Proxys</h1>
+      <p id="splash-subtitle" style="font-size: 1.2rem;">Ik ur here to watch anime sites lol</p>
+    </div>
+    <div id="proxys-count-indicator" class="glass page-count-indicator">
+      <span id="proxys-count-label" style="font-size: 0.78rem; opacity: 0.72; text-transform: uppercase; letter-spacing: 0.08em;">Proxys</span>
+      <strong id="proxys-count-value" style="font-size: 1.45rem; line-height: 1.1;">0 proxys</strong>
+      <span id="proxys-count-detail" style="font-size: 0.78rem; opacity: 0.72;">Showing all</span>
+    </div>
+  </section>
+
+  <div class="search-container glass page-search-shell">
+    <div class="search-wrapper">
+      <i data-lucide="search" class="search-icon"></i>
+      <input type="text" id="proxys-search" placeholder="Search proxys..." autocomplete="off">
+    </div>
+  </div>
+
+  <div id="proxys-no-results" class="no-results">No proxys matched that search.</div>
+
+  <div class="gallery" id="proxys-gallery">
+    <a href="https://instructure.storage.googleapis.com/index.html" class="card" target="_blank">
+      <img src="data:image/jpeg;base64,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" alt="">
+      <div class="title">DogeUB</div>
+    </a>
+    <a href="https://300pump.thedaedals.com/" class="card" target="_blank">
+      <img src="../features/logo.webp" alt="">
+      <div class="title">Space</div>
+    </a>
+    <a href="https://k0math.wiki.banglaraloprotidin.com/" class="card" target="_blank">
+      <img src="data:image/jpeg;base64,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" alt="">
+      <div class="title">Utopia</div>
+    </a>
+    <a href="https://123hello.alexkrav.se/" class="card" target="_blank">
+      <img src="../features/kronos.png" alt="">
+      <div class="title">Kronos</div>
+    </a>
+    <a href="https://realflock.segurosdepersonas.cl/" class="card" target="_blank">
+      <img src="../features/overcloakedd.png" alt="">
+      <div class="title">Over Cloaked</div>
+    </a>
+    <a href="https://rammer.nana.willowwoodgames.co.nz/" class="card" target="_blank">
+      <img src="../features/rammerheadd.png" alt="">
+      <div class="title">Rammer Head</div>
+    </a>
+    <a href="https://project.assignment.geometry.science.writing.marineequipment.info/" class="card" target="_blank">
+      <img src="../features/cuh.png" alt="">
+      <div class="title">Noahs Tutoring</div>
+    </a>
+  </div>
+
+  <div id="iframe-modal" class="modal glass" style="display: none;">
+    <div class="modal-content">
+      <button class="modal-close" title="Close" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
+      <div class="iframe-wrapper">
+        <iframe loading="lazy" id="modal-iframe" src="about:blank" frameborder="0"></iframe>
+      </div>
+      <div class="modal-controls">
+        <button id="btn-refresh"><i data-lucide="rotate-ccw" aria-hidden="true"></i> Refresh</button>
+        <button id="btn-fullscreen"><i data-lucide="maximize-2" aria-hidden="true"></i> Full Screen</button>
+        <button id="btn-new-tab"><i data-lucide="external-link" aria-hidden="true"></i> Open in new tab</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>
+    lucide.createIcons();
+
+    const settingsBtn = document.getElementById('settings-btn');
+    const settingsPanel = document.getElementById('settings-panel');
+    const body = document.body;
+    const navBar = document.getElementById('nav-bar');
+
+    settingsBtn.addEventListener('click', () => {
+      settingsPanel.style.display = settingsPanel.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    window.addEventListener('load', () => {
+      if (localStorage.getItem('bgColor')) body.style.backgroundColor = localStorage.getItem('bgColor');
+      if (localStorage.getItem('fontColor')) body.style.color = localStorage.getItem('fontColor');
+      if (localStorage.getItem('fontStyle')) body.style.fontFamily = localStorage.getItem('fontStyle');
+      if (localStorage.getItem('bgImage')) {
+        body.style.backgroundImage = `url(${localStorage.getItem('bgImage')})`;
+        body.style.backgroundSize = 'cover';
+        body.style.backgroundPosition = 'center';
+      }
+      if (localStorage.getItem('fontGlow') === 'true') {
+        body.classList.add('font-glow');
+        document.getElementById('font-glow').checked = true;
+      }
+      if (localStorage.getItem('navPosition')) {
+        applyNavPosition(localStorage.getItem('navPosition'));
+        document.getElementById('nav-position').value = localStorage.getItem('navPosition');
+      }
+      if (localStorage.getItem('tabTitle')) document.title = localStorage.getItem('tabTitle');
+      applyPageFavicon();
+    });
+
+    document.getElementById('bg-color').addEventListener('input', e => {
+      body.style.backgroundColor = e.target.value;
+      localStorage.setItem('bgColor', e.target.value);
+    });
+
+    document.getElementById('font-color').addEventListener('input', e => {
+      body.style.color = e.target.value;
+      localStorage.setItem('fontColor', e.target.value);
+    });
+
+    document.getElementById('font-style').addEventListener('change', e => {
+      body.style.fontFamily = e.target.value;
+      localStorage.setItem('fontStyle', e.target.value);
+    });
+
+    document.getElementById('bg-image').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const url = ev.target.result;
+        body.style.backgroundImage = `url(${url})`;
+        body.style.backgroundSize = 'cover';
+        body.style.backgroundPosition = 'center';
+        localStorage.setItem('bgImage', url);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('open-about-blank').addEventListener('click', () => {
+      const win = window.open('about:blank', '_blank');
+      const iframe = win.document.createElement('iframe');
+      iframe.src = location.href;
+      iframe.style.cssText = 'position:fixed;inset:0;border:none;width:100%;height:100%;';
+      win.document.body.appendChild(iframe);
+    });
+
+    document.getElementById('apply-cloak').addEventListener('click', () => {
+      const title = document.getElementById('tab-title').value.trim();
+      const favicon = document.getElementById('tab-favicon').value.trim();
+      if (title) {
+        document.title = title;
+        localStorage.setItem('tabTitle', title);
+      }
+      if (favicon) {
+        setFavicon(favicon);
+        localStorage.setItem('tabFavicon', favicon);
+      }
+    });
+
+    function setFavicon(url) {
+      if (window.ArcadyFavicon && typeof window.ArcadyFavicon.set === 'function') {
+        window.ArcadyFavicon.set(url);
+        return;
+      }
+
+      let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      link.rel = 'icon';
+      link.href = url;
+      document.head.appendChild(link);
+    }
+
+    function applyPageFavicon() {
+      if (window.ArcadyFavicon && typeof window.ArcadyFavicon.apply === 'function') {
+        window.ArcadyFavicon.apply();
+        return;
+      }
+
+      const savedFavicon = localStorage.getItem('tabFavicon');
+      if (savedFavicon) {
+        setFavicon(savedFavicon);
+        return;
+      }
+
+      setFavicon('https://cdn.jsdelivr.net/gh/arcady-web/arcady-web.github.io@main/favicon/checking-you-out-blue-emoji-blue.png');
+    }
+
+    document.getElementById('font-glow').addEventListener('change', e => {
+      body.classList.toggle('font-glow', e.target.checked);
+      localStorage.setItem('fontGlow', e.target.checked);
+    });
+
+    document.getElementById('nav-position').addEventListener('change', e => {
+      const pos = e.target.value;
+      applyNavPosition(pos);
+      localStorage.setItem('navPosition', pos);
+    });
+
+    function applyNavPosition(pos) {
+      navBar.style.position = 'fixed';
+      navBar.style.transform = '';
+      navBar.style.flexDirection = 'row';
+      navBar.style.minWidth = '92vw';
+      navBar.style.width = 'auto';
+      navBar.style.height = 'auto';
+      navBar.style.minHeight = '';
+      navBar.style.borderRadius = '24px';
+
+      if (pos === 'top-center') {
+        navBar.style.top = '20px';
+        navBar.style.bottom = '';
+        navBar.style.left = '50%';
+        navBar.style.right = '';
+        navBar.style.transform = 'translateX(-50%)';
+      } else if (pos === 'bottom-center') {
+        navBar.style.top = '';
+        navBar.style.bottom = '20px';
+        navBar.style.left = '50%';
+        navBar.style.right = '';
+        navBar.style.transform = 'translateX(-50%)';
+      } else if (pos === 'left') {
+        navBar.style.top = '50%';
+        navBar.style.bottom = '';
+        navBar.style.left = '20px';
+        navBar.style.right = '';
+        navBar.style.transform = 'translateY(-50%)';
+        navBar.style.flexDirection = 'column';
+        navBar.style.minWidth = 'auto';
+        navBar.style.minHeight = '50vh';
+      } else if (pos === 'right') {
+        navBar.style.top = '50%';
+        navBar.style.bottom = '';
+        navBar.style.left = '';
+        navBar.style.right = '20px';
+        navBar.style.transform = 'translateY(-50%)';
+        navBar.style.flexDirection = 'column';
+        navBar.style.minWidth = 'auto';
+        navBar.style.minHeight = '50vh';
+      }
+    }
+
+    document.getElementById('reset-settings').addEventListener('click', () => {
+      if (!confirm('Reset all settings to default?')) return;
+
+      localStorage.clear();
+      body.style.backgroundColor = '#87CEEB';
+      body.style.backgroundImage = '';
+      body.style.color = '#000000';
+      body.style.fontFamily = "'Fredoka', sans-serif";
+      body.classList.remove('font-glow');
+
+      document.getElementById('bg-color').value = '#87CEEB';
+      document.getElementById('font-color').value = '#000000';
+      document.getElementById('font-style').value = "'Fredoka', sans-serif";
+      document.getElementById('font-glow').checked = false;
+      document.getElementById('nav-position').value = 'top-center';
+      document.getElementById('tab-title').value = '';
+      document.getElementById('tab-favicon').value = '';
+
+      document.title = 'Arcady';
+      applyPageFavicon();
+
+      applyNavPosition('top-center');
+      settingsPanel.style.display = 'none';
+    });
+  </script>
+  <script>
+    const proxysSearch = document.getElementById('proxys-search');
+    const proxysGallery = document.getElementById('proxys-gallery');
+    const proxyCards = Array.from(proxysGallery.querySelectorAll('.card'));
+    const proxysCountValue = document.getElementById('proxys-count-value');
+    const proxysCountDetail = document.getElementById('proxys-count-detail');
+    const proxysNoResults = document.getElementById('proxys-no-results');
+
+    function updateProxyIndicator(visibleCount) {
+      const totalCount = proxyCards.length;
+      proxysCountValue.textContent = `${visibleCount} proxy${visibleCount === 1 ? '' : 's'}`;
+      proxysCountDetail.textContent = visibleCount === totalCount ? 'Showing all' : `${totalCount} total in section`;
+      proxysNoResults.style.display = visibleCount ? 'none' : 'block';
+    }
+
+    function filterProxys() {
+      const query = (proxysSearch.value || '').trim().toLowerCase();
+      let visibleCount = 0;
+
+      proxyCards.forEach(card => {
+        const title = card.querySelector('.title')?.textContent?.toLowerCase() || '';
+        const href = (card.getAttribute('href') || '').toLowerCase();
+        const matches = !query || title.includes(query) || href.includes(query);
+        card.style.display = matches ? '' : 'none';
+        if (matches) visibleCount += 1;
+      });
+
+      updateProxyIndicator(visibleCount);
+    }
+
+    proxysSearch.addEventListener('input', filterProxys);
+    filterProxys();
+  </script>
+  <script>
+    const modal = document.getElementById('iframe-modal');
+    const iframe = document.getElementById('modal-iframe');
+    const modalClose = document.querySelector('.modal-close');
+    const btnRefresh = document.getElementById('btn-refresh');
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    const btnNewTab = document.getElementById('btn-new-tab');
+    let currentUrl = '';
+
+    function closeModal() {
+      modal.style.display = 'none';
+      iframe.src = 'about:blank';
+      document.body.style.overflow = '';
+    }
+
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeModal();
+    });
+
+    btnRefresh.addEventListener('click', () => {
+      if (currentUrl) iframe.src = currentUrl;
+    });
+
+    btnNewTab.addEventListener('click', () => {
+      if (currentUrl) window.open(currentUrl, '_blank');
+      closeModal();
+    });
+
+    btnFullscreen.addEventListener('click', () => {
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+      } else if (iframe.webkitRequestFullscreen) {
+        iframe.webkitRequestFullscreen();
+      } else if (iframe.msRequestFullscreen) {
+        iframe.msRequestFullscreen();
+      }
+    });
+
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', e => {
+        e.preventDefault();
+        const url = card.getAttribute('href');
+        if (!url || url === '#' || url.startsWith('javascript:')) return;
+
+        currentUrl = url;
+        iframe.src = url;
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      });
+    });
+  </script>
+  <script>
+    const subtitles = [
+      "Totally Not From The Creator Of Arcadium...",
+      "Broo this was made less than a week",
+      "Unfiltered internet since breakfast",
+      "We have proxies and bad decisions",
+      "Jeffry Epstein? Ive never heard of him",
+      "Not approved by any school district",
+      "Ladies calm down",
+      "oozeeeeeeeeee approved",
+      "Incognito mode is for cowards",
+      "Made with spite and glitter",
+      "If the FBI is watching, hi mom!",
+      "Loading your daily dose of questionable content...",
+      "Certified 100% vibe-based",
+      "Press F13 to summon the void",
+      "This is probably fine",
+      "Error 418: I'm Gay",
+      "Banned in 47 countries (rumored)",
+      "Your honor, my client was just vibing",
+      "404: Motivation not found",
+      "Running on hopes and expired dreams",
+      "Corny ahh shyt",
+      "Theres a 1% chance u see this",
+      "Class of 067",
+      "Brooooo",
+      "I do this instead of my homework",
+      "I NEED EMPLOYEES",
+      "Frogies Arcade?",
+      "Dude Typical Productions was never peak",
+      "Ooze drooze club",
+      "Omes Typical Site Vs Oooze Crib",
+      "riurgrwibfuwebfwefwef",
+      "She gon call me baby boo",
+      "Gooning since i was born (:",
+      "HOLY LAG",
+      "#cornballs",
+      "Brocadium",
+      "Oooze likes to eat drooze",
+      "Plz request things ill add them for sure",
+      "Hey make sure to check out everythiing we offer",
+      "Grown ass man btw",
+      "DUDE 90% ZOOM IS THE BEST PLEASE TRY IT",
+      "THEY BANNED FASTLYYY NOOOO",
+      "ima kms",
+      "Good game well played"
+    ];
+
+    function changeSubtitle() {
+      const el = document.getElementById("splash-subtitle");
+      el.classList.add("fade");
+
+      setTimeout(() => {
+        const randomIndex = Math.floor(Math.random() * subtitles.length);
+        el.textContent = subtitles[randomIndex];
+        el.classList.remove("fade");
+      }, 1200);
+    }
+
+    setInterval(changeSubtitle, 5000);
+    setTimeout(changeSubtitle, 5000);
+  </script>
+  <script>
+    (function () {
+      function load(src) {
+        return new Promise(function (resolve, reject) {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+
+      load('../features/admin/firebase-config.js?v=14').then(function () {
+        return load('../features/admin/site-admin.js?v=14');
+      }).catch(function (error) {
+        console.error('Arcady admin loader failed:', error);
+      });
+    })();
+  </script>
+  <script src="../features/shared-more-windows.js?v=1"></script>
+  <script src="../features/broadcast-more-notify.js?v=1"></script>
+</body>
+</html>

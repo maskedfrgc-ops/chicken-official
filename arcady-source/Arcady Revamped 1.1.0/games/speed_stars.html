@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Speed Stars">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#231F20">
+  <title>Speed Stars</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- iOS Icons -->
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-96.png">
+
+  <script>
+    window.config = {
+      loader: 'unity-2020',
+      debug: false,
+      maxRatio: 24 / 9,
+      minRatio: 9 / 24,
+      title: 'Speed Stars',
+      thumbnail: 'icon.png',
+      numScreenshots: 0,
+      unityVersion: '2022.3.19f1',
+      unityWebglBuildUrl: '',
+      fileSize: 37,
+      cachedDecompressedFileSizes: {
+        '6127fbba3e79cbcada24ba1ffd033f77.data': 13472152,
+        'Build_v2-40w.loader.js': 20642,
+        'b0e5ec181474d494c6ff3c9ad9c3b1bd.js': 405098,
+        'fe2a5824416bebe1cc941510618103f9.wasm': 23552919,
+      },
+      "metadata": {
+        "poki_template_version": 1,
+        "background_color": "#231F20",
+        "code_filename": "fe2a5824416bebe1cc941510618103f9.wasm",
+        "company_name": "Luke Doukakis",
+        "data_filename": "6127fbba3e79cbcada24ba1ffd033f77.data",
+        "development_player": "false",
+        "framework_filename": "b0e5ec181474d494c6ff3c9ad9c3b1bd.js",
+        "height": "360",
+        "loader_filename": "Build_v2-40w.loader.js",
+        "product_name": "Speed Stars",
+        "product_version": "2.40",
+        "splash_screen_style": "Dark",
+        "unity_version": "2022.3.19f1",
+        "use_data_caching": "true",
+        "use_threads": "false",
+        "use_wasm": "true",
+        "use_webgl_1_0": "false",
+        "use_webgl_2_0": "true",
+        "width": "640"
+      }
+    };
+  </script>
+</head>
+
+<body>
+  <script>
+    // Service Worker Registration for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(registration => {
+            console.log('SW registered:', registration.scope);
+          })
+          .catch(error => {
+            console.log('SW registration failed:', error);
+          });
+      });
+    }
+    
+    window.onbeforeunload = function (e) {
+      return true;
+    };
+
+    // Mobile Touch Controls - Three Zone Layout
+    // Left third: Left Arrow (tap) + Down Arrow (swipe down)
+    // Middle third: Down Arrow (swipe down)
+    // Right third: Right Arrow (tap) + Down Arrow (swipe down)
+    (function() {
+      // Function to dispatch keyboard events to the Unity canvas
+      function simulateKeyEvent(type, keyCode, key, code) {
+        const canvas = document.querySelector('canvas');
+        const target = canvas || document;
+        
+        const event = new KeyboardEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          keyCode: keyCode,
+          which: keyCode,
+          key: key,
+          code: code || key
+        });
+        
+        target.dispatchEvent(event);
+      }
+
+      // Track active touches for left/right
+      let leftPressed = false;
+      let rightPressed = false;
+
+      // Track ALL touches for swipe detection (not just middle zone)
+      const swipeThreshold = 30; // Minimum pixels to count as a swipe
+      let allTouches = {}; // Track all touches for swipe detection
+
+      // Get zone for a given X position (0 = left, 1 = middle, 2 = right)
+      function getZone(x) {
+        const screenWidth = window.innerWidth;
+        const thirdWidth = screenWidth / 3;
+        if (x < thirdWidth) return 0; // Left
+        if (x < thirdWidth * 2) return 1; // Middle
+        return 2; // Right
+      }
+
+      // Handle touch start
+      document.addEventListener('touchstart', function(e) {
+        const touches = e.changedTouches;
+        
+        for (let i = 0; i < touches.length; i++) {
+          const touch = touches[i];
+          const zone = getZone(touch.clientX);
+          
+          // Track ALL touches for swipe detection
+          allTouches[touch.identifier] = {
+            startX: touch.clientX,
+            startY: touch.clientY,
+            zone: zone,
+            swipeTriggered: false
+          };
+          
+          if (zone === 0) {
+            // Left zone - trigger left arrow
+            if (!leftPressed) {
+              leftPressed = true;
+              simulateKeyEvent('keydown', 37, 'ArrowLeft', 'ArrowLeft');
+            }
+          } else if (zone === 2) {
+            // Right zone - trigger right arrow
+            if (!rightPressed) {
+              rightPressed = true;
+              simulateKeyEvent('keydown', 39, 'ArrowRight', 'ArrowRight');
+            }
+          }
+          // Middle zone (zone === 1) - no tap action, only swipe
+        }
+      }, { passive: true });
+
+      // Handle touch move (for swipe detection on ALL zones)
+      document.addEventListener('touchmove', function(e) {
+        const touches = e.changedTouches;
+        
+        for (let i = 0; i < touches.length; i++) {
+          const touch = touches[i];
+          const startData = allTouches[touch.identifier];
+          
+          if (startData && !startData.swipeTriggered) {
+            const deltaY = touch.clientY - startData.startY;
+            const deltaX = Math.abs(touch.clientX - startData.startX);
+            
+            // Check if it's a downward swipe (more vertical than horizontal)
+            if (deltaY > swipeThreshold && deltaY > deltaX) {
+              // Trigger down arrow
+              startData.swipeTriggered = true;
+              simulateKeyEvent('keydown', 40, 'ArrowDown', 'ArrowDown');
+              // Brief press - release after a short delay
+              setTimeout(function() {
+                simulateKeyEvent('keyup', 40, 'ArrowDown', 'ArrowDown');
+              }, 100);
+            }
+          }
+        }
+      }, { passive: true });
+
+      // Handle touch end
+      document.addEventListener('touchend', function(e) {
+        const touches = e.changedTouches;
+        
+        for (let i = 0; i < touches.length; i++) {
+          const touch = touches[i];
+          const startData = allTouches[touch.identifier];
+          
+          if (startData) {
+            const zone = startData.zone; // Use original zone, not current position
+            
+            if (zone === 0) {
+              // Left zone
+              if (leftPressed) {
+                leftPressed = false;
+                simulateKeyEvent('keyup', 37, 'ArrowLeft', 'ArrowLeft');
+              }
+            } else if (zone === 2) {
+              // Right zone
+              if (rightPressed) {
+                rightPressed = false;
+                simulateKeyEvent('keyup', 39, 'ArrowRight', 'ArrowRight');
+              }
+            }
+            
+            // Clean up tracking
+            delete allTouches[touch.identifier];
+          }
+        }
+      }, { passive: true });
+
+      // Handle touch cancel
+      document.addEventListener('touchcancel', function(e) {
+        const touches = e.changedTouches;
+        
+        for (let i = 0; i < touches.length; i++) {
+          const touch = touches[i];
+          delete allTouches[touch.identifier];
+        }
+        
+        // Release all keys on cancel
+        if (leftPressed) {
+          leftPressed = false;
+          simulateKeyEvent('keyup', 37, 'ArrowLeft', 'ArrowLeft');
+        }
+        if (rightPressed) {
+          rightPressed = false;
+          simulateKeyEvent('keyup', 39, 'ArrowRight', 'ArrowRight');
+        }
+      }, { passive: true });
+
+      console.log('Mobile touch controls initialized:');
+      console.log('  Left third = Left Arrow (tap) + Down Arrow (swipe down)');
+      console.log('  Middle third = Down Arrow (swipe down)');
+      console.log('  Right third = Right Arrow (tap) + Down Arrow (swipe down)');
+    })();
+  </script>
+  <script src="master-loader.js"></script>

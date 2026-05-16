@@ -1,0 +1,100 @@
+{
+  "themes": [
+    {
+      "id": "default-arcady",
+      "label": "Default Arcady",
+      "cursor": "./features/cursors/cursor/cursor.png",
+      "pointer": "./features/cursors/pointer/pointer.png"
+    },
+    {
+      "id": "3d-black-stroke-mac",
+      "label": "3D Black Stroke Mac",
+      "cursor": "./features/cursors/cursor/3D Black Stroke Mac--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/3D Black Stroke Mac--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "3d-mac",
+      "label": "3D Mac",
+      "cursor": "./features/cursors/cursor/3D Mac--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/3D Mac--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "67-kid-dark",
+      "label": "67 Kid Dark",
+      "cursor": "./features/cursors/cursor/67 Kid Dark--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/67 Kid Dark--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "black-rainbow-stroke-gradient",
+      "label": "Black & Rainbow Stroke Gradient",
+      "cursor": "./features/cursors/cursor/Black & Rainbow Stroke Gradient Animated--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/Black & Rainbow Stroke Gradient Animated--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "crayon-texture",
+      "label": "Crayon Texture",
+      "cursor": "./features/cursors/cursor/Crayon Texture--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/Crayon Texture--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "distorted-prank-macos",
+      "label": "Distorted Prank macOS",
+      "cursor": "./features/cursors/cursor/Distorted Prank macOS Animated--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/Distorted Prank macOS Animated--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "duct-tape-banana",
+      "label": "Duct Tape Banana",
+      "cursor": "./features/cursors/cursor/Duct Tape Banana--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/Duct Tape Banana--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "fried-egg-texture",
+      "label": "Fried Egg Texture",
+      "cursor": "./features/cursors/cursor/Fried Egg Texture--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/Fried Egg Texture--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "glass-texture",
+      "label": "Glass Texture",
+      "cursor": "./features/cursors/cursor/Glass Texture--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/Glass Texture--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "handsome-squidward-meme",
+      "label": "Handsome Squidward Meme",
+      "cursor": "./features/cursors/cursor/Handsome Squidward Meme--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/Handsome Squidward Meme--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "jerry-mouse-meme",
+      "label": "Jerry Mouse Meme",
+      "cursor": "./features/cursors/cursor/Jerry Mouse Meme--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/Jerry Mouse Meme--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "meowl-meme",
+      "label": "Meowl Meme",
+      "cursor": "./features/cursors/cursor/Meowl Meme Animated--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/Meowl Meme Animated--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "minecraft-enchanted-netherite-sword",
+      "label": "Minecraft Enchanted Netherite Sword",
+      "cursor": "./features/cursors/cursor/Minecraft Enchanted Netherite Sword Animated--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/Minecraft Enchanted Netherite Sword Animated--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "tetris-texture",
+      "label": "Tetris Texture",
+      "cursor": "./features/cursors/cursor/Tetris Texture--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/Tetris Texture--pointer--SweezyCursors.png"
+    },
+    {
+      "id": "windows-95-98-arrow-logo",
+      "label": "Windows 95/98 Arrow & Logo",
+      "cursor": "./features/cursors/cursor/Windows 95_98 Arrow & Logo Animated--cursor--SweezyCursors.png",
+      "pointer": "./features/cursors/pointer/Windows 95_98 Arrow & Logo Animated--pointer--SweezyCursors.png"
+    }
+  ]
+}

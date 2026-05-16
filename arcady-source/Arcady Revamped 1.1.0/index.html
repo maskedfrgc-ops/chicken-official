@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Arcady - Revamped 1.1.0</title>
+  <link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/arcady-web/arcady-web.github.io@main/favicon/checking-you-out-blue-emoji-blue.png">
+  <link rel="shortcut icon" type="image/png" href="https://cdn.jsdelivr.net/gh/arcady-web/arcady-web.github.io@main/favicon/checking-you-out-blue-emoji-blue.png">
+  <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/arcady-web/arcady-web.github.io@main/favicon/checking-you-out-blue-emoji-blue.png">
+  <script src="./shared-favicon.js?v=1" defer></script>
+
+  <!-- Fonts (updated to humanist/system sans for Frutiger-like look) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="boot-loader boot-loader-hidden" id="boot-loader" aria-hidden="true">
+    <video
+      class="boot-loader-video"
+      id="boot-loader-video"
+      src="https://cdn.jsdelivr.net/gh/arcady-web/arcady-web.github.io@main/features/mp4s/macOS%20Boot%20Up%20Animation%20(Classic%20Dark).mp4"
+      playsinline
+      webkit-playsinline
+      preload="none"
+    ></video>
+    <button class="boot-loader-prompt" id="boot-loader-prompt" type="button">
+      Click anywhere to start the boot screen
+    </button>
+  </div>
+
+  <!--Navigation Bar (macOS-style bottom dock; icon-only using Lucide) -->
+  <nav class="glass" id="nav-bar" role="navigation" aria-label="Primary">
+    <div class="nav-links" role="menubar">
+      <a href="index.html" role="menuitem" aria-label="Home"><i data-lucide="home"></i></a>
+      <a href="Pages/games.html" role="menuitem" aria-label="Games"><i data-lucide="gamepad-2"></i></a>
+      <a href="Pages/proxys.html" role="menuitem" aria-label="Proxys"><i data-lucide="layout-grid"></i></a>
+      <a href="Pages/websites.html" role="menuitem" aria-label="Websites"><i data-lucide="globe"></i></a>
+      <a href="Pages/chat.html" role="menuitem" aria-label="Chat"><i data-lucide="message-circle"></i></a>
+      <a href="Pages/chatgpt.html" role="menuitem" aria-label="AI"><i data-lucide="brain"></i></a>
+      <button id="settings-btn" aria-label="Settings"><i data-lucide="settings"></i></button>
+    </div>
+  </nav>
+
+  <!--Settings Panel-->
+  <div id="settings-panel" class="glass">
+    <!-- (your settings panel content stays exactly the same) -->
+    <label for="bg-color">Background Color:</label>
+    <input type="color" id="bg-color" value="#87CEEB">
+    <label for="font-color">Font Color:</label>
+    <input type="color" id="font-color" value="#000000">
+    <label for="font-style">Font Style:</label>
+    <select id="font-style">
+      <option value="'Fredoka', sans-serif">Fredoka</option>
+      <option value="'Roboto', sans-serif">Roboto</option>
+      <option value="'Playfair Display', serif">Playfair Display</option>
+    </select>
+    <label for="bg-image">Background Image:</label>
+    <input type="file" id="bg-image" accept="image/*">
+    <button id="open-about-blank">Open in about:blank</button>
+    <label for="tab-title">Tab Cloak Title:</label>
+    <input type="text" id="tab-title" placeholder="e.g., Google Classroom">
+    <label for="tab-favicon">Tab Cloak Favicon URL:</label>
+    <input type="text" id="tab-favicon" placeholder="https://.../favicon.ico">
+    <button id="apply-cloak">Apply Tab Cloak</button>
+    <label>Font Glow:</label>
+    <input type="checkbox" id="font-glow">
+    <label for="nav-position">Nav Position:</label>
+    <select id="nav-position">
+      <option value="top-center">Top Center</option>
+      <option value="bottom-center" selected>Bottom Center</option>
+      <option value="left">Left Side</option>
+      <option value="right">Right Side</option>
+    </select>
+    <button id="reset-settings">Reset All Settings</button>
+  </div>
+
+
+<!--boxes-->
+  <section class="glass" style="margin: 80px auto; max-width: 1380px; padding: 3.5rem 2.5rem; text-align: center;">
+    <h2 style="font-size: 3.1rem; margin-bottom: 1rem; text-shadow: 0 4px 15px rgba(0,0,0,0.3);">Arcady - REVAMPED 1.1.0</h2>
+    <p id="splash-subtitle" style="margin-bottom: 3rem;">No</p>
+
+    <div class="home-live-shell">
+      <section class="home-live-hub glass">
+        <div class="home-live-grid">
+          <div class="home-live-stats">
+            <div class="xp-panel" id="xp-panel">
+              <div class="xp-panel-head">
+                <div class="xp-panel-kicker">Arcady XP</div>
+                <div class="xp-panel-level" id="xp-level-text">Level 1</div>
+              </div>
+              <div class="xp-bar-shell">
+                <div class="xp-bar-fill" id="xp-bar-fill"></div>
+              </div>
+              <div class="xp-panel-meta" id="xp-panel-meta">0 / 100 XP to Level 2</div>
+              <div class="xp-panel-submeta" id="xp-panel-submeta">Click around, stay online, and rack up visits to earn XP.</div>
+            </div>
+
+            <div class="home-news-panel" id="home-news-panel">
+              <div class="home-news-label">Live News</div>
+              <div class="home-news-text" id="home-news-text">No live news posted yet. Owner updates will show up here.</div>
+              <div class="home-news-meta" id="home-news-meta">Live updates from the owner panel will appear here.</div>
+            </div>
+
+            <div class="live-active-status is-connecting home-live-status" id="live-active-status">
+              <div class="live-active-dot"></div>
+              <div class="live-active-copy">
+                <div class="live-active-clock" id="live-active-clock">Checking who is active...</div>
+                <div class="live-active-names" id="live-active-names">Active nicknames will show up here.</div>
+              </div>
+            </div>
+            <section class="home-live-status home-pet-panel glass" id="home-pet-panel">
+              <div class="home-pet-head">
+                <div>
+                  <div class="home-pet-kicker">Home pet</div>
+                  <div class="home-pet-title" id="pet-title">Egg ready</div>
+                </div>
+                <button id="pet-hatch-button" class="pet-action-btn" type="button">Hatch egg</button>
+              </div>
+              <div class="home-pet-body">
+                <div class="pet-egg-slot" id="pet-egg-slot">🥚</div>
+                <div class="pet-info">
+                  <div class="pet-status" id="pet-status">A frog egg waits in the shell. Hatch it to begin your adventure.</div>
+                  <div class="pet-meta" id="pet-meta">Name your frog, feed it, and send it on adventures.</div>
+                </div>
+              </div>
+              <div class="pet-controls-panel" id="pet-controls-panel" hidden>
+                <label for="pet-name-input" class="pet-name-label">Pet name</label>
+                <div class="pet-name-row">
+                  <input id="pet-name-input" class="pet-name-input" type="text" maxlength="16" placeholder="Give your frog a name">
+                  <button id="pet-name-save" class="pet-action-btn" type="button">Save</button>
+                </div>
+                <div class="pet-stats-row">
+                  <span id="pet-age-text">Age: 0</span>
+                  <span id="pet-hunger-text">Hunger: 100%</span>
+                  <span id="pet-affection-text">Affection: 50%</span>
+                </div>
+                <div class="pet-command-row">
+                  <button id="pet-feed-btn" class="pet-control-btn" type="button">Feed</button>
+                  <button id="pet-pet-btn" class="pet-control-btn" type="button">Pet</button>
+                  <button id="pet-adventure-btn" class="pet-control-btn" type="button">Adventure</button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="home-live-body">
+            <div class="home-live-main-col">
+              <section class="home-live-tv-panel" id="home-live-tv-panel">
+                <div class="home-live-tv-head">
+                  <div>
+                    <div class="home-live-tv-kicker">Live TV</div>
+                    <h3 class="home-live-tv-title" id="home-live-tv-title">Static Broadcast</h3>
+                  </div>
+                  <div class="home-live-tv-meta" id="home-live-tv-meta">No live broadcast right now. Static mode is on until the owner goes live.</div>
+                </div>
+                <div class="home-live-tv-screen">
+                  <div class="home-live-tv-static" id="home-live-tv-static" aria-hidden="true"></div>
+                  <img class="home-live-tv-image" id="home-live-tv-image" alt="Live TV image broadcast" hidden>
+                  <video class="home-live-tv-video" id="home-live-tv-video" playsinline webkit-playsinline loop controls preload="none"></video>
+                  <iframe loading="lazy" class="home-live-tv-embed" id="home-live-tv-embed" title="Live TV YouTube broadcast" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; web-share" allowfullscreen hidden></iframe>
+                </div>
+              </section>
+
+              <section class="home-live-schedule-panel" aria-label="Bell schedule">
+                <div class="home-live-schedule-frame">
+                  <div class="home-live-schedule-scroll">
+                    <img src="features/bell scheduale.jpg" alt="School bell schedule" class="bell-schedule-image">
+                    <img src="features/MSApril2026Menu_page-0001.jpg" alt="April 2026 menu" class="bell-schedule-image">
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div class="home-live-chat-wrap">
+              <section class="home-chat-panel" id="home-chat-panel">
+                <div class="home-chat-header">
+                  <div>
+                    <div class="home-chat-kicker">Arcady Chat</div>
+                    <h3 class="home-chat-title">Quick homepage chat</h3>
+                  </div>
+                  <div class="home-chat-header-actions">
+                    <button id="home-chat-refresh" class="home-chat-refresh" type="button" title="Refresh chat"><i data-lucide="refresh-cw"></i> Refresh</button>
+                    <div class="home-chat-status" id="home-chat-status">Set your nickname above to start chatting.</div>
+                  </div>
+                </div>
+                <div class="home-chat-nickname-panel nickname-panel" id="home-chat-nickname-panel">
+                  <label for="nickname-input" class="nickname-label">Set your nickname</label>
+                  <div class="nickname-avatar-row">
+                    <button type="button" class="nickname-avatar-btn" id="nickname-avatar-btn" aria-label="Add profile picture">
+                      <img class="nickname-avatar-preview-img" id="nickname-avatar-preview-img" alt="" width="48" height="48" hidden>
+                      <span class="nickname-avatar-initial" id="nickname-avatar-initial">?</span>
+                    </button>
+                    <input type="file" id="nickname-avatar-input" accept="image/*" hidden>
+                    <button type="button" class="nickname-avatar-clear" id="nickname-avatar-clear">Clear pic</button>
+                    <span class="nickname-avatar-hint">Optional picture shows on your chat messages.</span>
+                  </div>
+                  <div class="nickname-row">
+                    <input id="nickname-input" class="nickname-input" type="text" maxlength="24" placeholder="Type a nickname">
+                    <button id="nickname-save" class="nickname-save" type="button">Save</button>
+                  </div>
+                </div>
+                <div class="home-chat-feed" id="home-chat-feed" aria-live="polite">
+                  <div class="home-chat-empty" id="home-chat-empty">No messages yet. Save a nickname above and be the first one to say something.</div>
+                </div>
+                <div class="home-chat-typing-bar" id="home-chat-typing" aria-live="polite" aria-atomic="true" hidden></div>
+                <div class="home-chat-compose">
+                  <div class="home-chat-compose-row">
+                    <input id="home-chat-input" class="home-chat-input" type="text" maxlength="400" placeholder="Set your nickname above to unlock chat">
+                    <label for="home-chat-image-input" class="home-chat-attach" id="home-chat-attach">Image</label>
+                    <button id="home-chat-gif-toggle" class="home-chat-gif-toggle" type="button">Media</button>
+                    <input id="home-chat-image-input" type="file" accept="image/*" hidden>
+                    <button id="home-chat-send" class="home-chat-send" type="button">Send</button>
+                  </div>
+                  <div class="home-chat-compose-meta">
+                    <div class="home-chat-file" id="home-chat-file">No image selected</div>
+                  </div>
+                  <div class="home-chat-gif-panel" id="home-chat-gif-panel">
+                    <div class="home-chat-gif-toolbar">
+                      <div class="home-chat-gif-title">Media &amp; stickers</div>
+                      <div class="home-chat-gif-status" id="home-chat-gif-status">Open Media to load the libraries.</div>
+                    </div>
+                    <div class="home-chat-sticker-mode-bar" role="group" aria-label="How to send stickers">
+                      <span class="home-chat-sticker-mode-label">Send stickers as</span>
+                      <label class="home-chat-sticker-mode-opt"><input type="radio" name="home-chat-sticker-mode" id="home-chat-sticker-mode-box" value="box" checked> Large (box)</label>
+                      <label class="home-chat-sticker-mode-opt"><input type="radio" name="home-chat-sticker-mode" id="home-chat-sticker-mode-inline" value="inline"> Inline 32×32</label>
+                    </div>
+                    <div class="home-chat-gif-section">
+                      <div class="home-chat-gif-subtitle">Arcady library</div>
+                      <div class="home-chat-gif-grid" id="home-chat-gif-grid">
+                        <div class="home-chat-gif-empty">Open Media to load the Arcady library.</div>
+                      </div>
+                    </div>
+                    
+                    <div class="home-chat-gif-section home-chat-bluemoji-section">
+                      <div class="home-chat-gif-subtitle">Bluemoji <a class="home-chat-slackmojis-source" href="https://bluemoji.io/" target="_blank" rel="noopener noreferrer">bluemoji.io</a></div>
+                      <div class="home-chat-gif-grid home-chat-bluemoji-grid" id="home-chat-bluemoji-grid">
+                        <div class="home-chat-gif-empty">Open Media to load Bluemoji from bluemoji.io.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              <section class="home-live-poll-panel" aria-label="Live poll">
+                <div class="home-live-poll-head">
+                  <div class="home-live-poll-kicker">Live Poll</div>
+                  <h3 class="home-live-poll-title">Owner polls appear here</h3>
+                </div>
+                <div class="home-live-poll-body" id="home-poll-body">
+                  <div class="home-live-poll-empty">No active poll right now.</div>
+                </div>
+              </section>
+              <section class="home-leaderboard-panel glass" id="home-leaderboard-panel">
+                <div class="home-leaderboard-head">
+                  <div>
+                    <div class="home-leaderboard-kicker">Leaderboard</div>
+                    <h3 class="home-leaderboard-title">Top XP players</h3>
+                  </div>
+                  <div class="home-leaderboard-meta" id="home-leaderboard-meta">Sorted by XP</div>
+                </div>
+                <div class="home-leaderboard-scroll" id="home-leaderboard-scroll">
+                  <div class="home-leaderboard-empty">Leaderboard is loading...</div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="gallery">
+      <a href="Pages/vault.html" class="card">
+        <i data-lucide="vault" style="width:120px; height:120px; color:rgba(255,255,255,0.9); position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);"></i>
+        <div class="title">Arcady Vault</div>
+      </a>
+      <a href="https://ooze34pc.w3spaces.com/" target="_blank" class="card">
+        <img src="features/oozelogo.png" alt="picture isn't loading bruh">
+        <div class="title">Ooze Crib</div>
+      </a>
+      <a href="Pages/staff.html" class="card">
+        <i data-lucide="users" style="width:120px; height:120px; color:rgba(255,255,255,0.9); position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);"></i>
+        <div class="title">Staff</div>
+      </a>
+      <a href="Pages/walloffame.html" class="card">
+        <i data-lucide="crown" style="width:120px; height:120px; color:rgba(255,255,255,0.9); position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);"></i>
+        <div class="title">Wall Of Fame</div>
+      </a>
+      <a href="https://chickengamez.my.canva.site/" target="_blank" class="card">
+        <img src="data:image/jpeg;base64,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" alt="picture isn't loading bruh">
+        <div class="title">Chicken 1.0</div>
+      </a>
+    </div>
+
+    <div id="pet-follow-container" class="pet-follow-container" hidden>
+      <img id="pet-follow-image" class="pet-follow-image" src="" alt="Your pet frog" aria-hidden="true">
+    </div>
+
+    <div id="iframe-modal" class="modal glass" style="display: none;">
+      <div class="modal-content">
+        <button class="modal-close" type="button" title="Close"><i data-lucide="x"></i></button>
+        <div class="iframe-wrapper">
+                  <iframe loading="lazy" id="modal-iframe" src="about:blank" title="Embedded page" frameborder="0"></iframe>
+        </div>
+        <div class="modal-controls">
+          <button id="btn-refresh" type="button"><i data-lucide="rotate-cw"></i> Refresh</button>
+          <button id="btn-fullscreen" type="button"><i data-lucide="maximize-2"></i> Full Screen</button>
+          <button id="btn-new-tab" type="button"><i data-lucide="external-link"></i> Open in new tab</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+ <!--Javascript Stuff-->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>
+    lucide.createIcons();
+
+    const settingsBtn = document.getElementById('settings-btn');
+    const settingsPanel = document.getElementById('settings-panel');
+    const body = document.body;
+    const navBar = document.getElementById('nav-bar');
+    const homeLiveHub = document.querySelector('.home-live-hub');
+    const bootLoader = document.getElementById('boot-loader');
+
+    function setFavicon(url) {
+      if (window.ArcadyFavicon && typeof window.ArcadyFavicon.set === 'function') {
+        window.ArcadyFavicon.set(url);
+        return;
+      }
+      let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      link.rel = 'icon';
+      link.href = url;
+      document.head.appendChild(link);
+    }
+
+    function applyPageFavicon() {
+      if (window.ArcadyFavicon && typeof window.ArcadyFavicon.apply === 'function') {
+        window.ArcadyFavicon.apply();
+        return;
+      }
+      const savedFavicon = localStorage.getItem('tabFavicon');
+      if (savedFavicon) {
+        setFavicon(savedFavicon);
+        return;
+      }
+      setFavicon('https://cdn.jsdelivr.net/gh/arcady-web/arcady-web.github.io@main/favicon/checking-you-out-blue-emoji-blue.png');
+    }
+    const bootLoaderVideo = document.getElementById('boot-loader-video');
+    const bootLoaderPrompt = document.getElementById('boot-loader-prompt');
+    const bootSessionKey = 'arcadyIndexBootPlayed';
+    let bootInteractionController = null;
+
+    function hideBootLoader() {
+      if (!bootLoader) return;
+      bootLoader.setAttribute('aria-hidden', 'true');
+      bootLoader.classList.add('boot-loader-hidden');
+      bootLoader.classList.remove('boot-loader-awaiting-interaction');
+      if (bootInteractionController) {
+        bootInteractionController.abort();
+        bootInteractionController = null;
+      }
+      body.classList.remove('boot-sequence-active');
+      window.setTimeout(() => {
+        if (bootLoader.parentNode) {
+          bootLoader.remove();
+        }
+      }, 450);
+    }
+
+    function startBootPlayback() {
+      if (!bootLoaderVideo) return Promise.resolve();
+      bootLoaderVideo.muted = false;
+      bootLoaderVideo.defaultMuted = false;
+      bootLoaderVideo.volume = 1;
+      return bootLoaderVideo.play();
+    }
+
+    function playBootLoaderOnce() {
+      if (!bootLoader || !bootLoaderVideo) return;
+
+      if (sessionStorage.getItem(bootSessionKey) === 'true') {
+        hideBootLoader();
+        return;
+      }
+
+      sessionStorage.setItem(bootSessionKey, 'true');
+      body.classList.add('boot-sequence-active');
+      bootLoader.classList.remove('boot-loader-hidden');
+      bootLoader.setAttribute('aria-hidden', 'false');
+      const bootFailSafe = window.setTimeout(hideBootLoader, 15000);
+      let interactionListenersBound = false;
+
+      const finishBoot = () => {
+        bootLoaderVideo.removeEventListener('ended', finishBoot);
+        bootLoaderVideo.removeEventListener('error', finishBoot);
+        window.clearTimeout(bootFailSafe);
+        hideBootLoader();
+      };
+
+      const retryBootWithInteraction = () => {
+        if (bootLoader.classList.contains('boot-loader-hidden')) return;
+        bootLoader.classList.remove('boot-loader-awaiting-interaction');
+        startBootPlayback().catch(() => {
+          bootLoader.classList.add('boot-loader-awaiting-interaction');
+        });
+      };
+
+      const bindInteractionRetry = () => {
+        if (interactionListenersBound) return;
+        interactionListenersBound = true;
+        bootInteractionController = new AbortController();
+        ['pointerdown', 'keydown', 'touchstart'].forEach(eventName => {
+          window.addEventListener(eventName, retryBootWithInteraction, {
+            passive: true,
+            signal: bootInteractionController.signal
+          });
+        });
+        if (bootLoaderPrompt) {
+          bootLoaderPrompt.addEventListener('click', retryBootWithInteraction, {
+            signal: bootInteractionController.signal
+          });
+        }
+      };
+
+      bootLoaderVideo.addEventListener('ended', finishBoot, { once: true });
+      bootLoaderVideo.addEventListener('error', finishBoot, { once: true });
+
+      const playAttempt = startBootPlayback();
+      if (playAttempt && typeof playAttempt.catch === 'function') {
+        playAttempt.catch(() => {
+          bindInteractionRetry();
+          bootLoader.classList.add('boot-loader-awaiting-interaction');
+        });
+      }
+    }
+
+    playBootLoaderOnce();
+
+    // Toggle settings
+    settingsBtn.addEventListener('click', () => {
+      settingsPanel.style.display = settingsPanel.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    if (homeLiveHub) {
+      homeLiveHub.addEventListener('wheel', event => {
+        if (event.target && event.target.closest('.home-chat-feed')) {
+          return;
+        }
+        if (Math.abs(event.deltaY) > Math.abs(event.deltaX) && homeLiveHub.scrollWidth > homeLiveHub.clientWidth) {
+          event.preventDefault();
+          homeLiveHub.scrollLeft += event.deltaY;
+        }
+      }, { passive: false });
+    }
+
+    // Load saved settings
+    window.addEventListener('load', () => {
+      if (localStorage.getItem('bgColor')) body.style.backgroundColor = localStorage.getItem('bgColor');
+      if (localStorage.getItem('fontColor')) body.style.color = localStorage.getItem('fontColor');
+      if (localStorage.getItem('fontStyle')) body.style.fontFamily = localStorage.getItem('fontStyle');
+      if (localStorage.getItem('bgImage')) {
+        body.style.backgroundImage = `url(${localStorage.getItem('bgImage')})`;
+        body.style.backgroundSize = 'cover';
+        body.style.backgroundPosition = 'center';
+      }
+      if (localStorage.getItem('fontGlow') === 'true') {
+        body.classList.add('font-glow');
+        document.getElementById('font-glow').checked = true;
+      }
+      if (localStorage.getItem('navPosition')) {
+        applyNavPosition(localStorage.getItem('navPosition'));
+        document.getElementById('nav-position').value = localStorage.getItem('navPosition');
+      }
+      if (localStorage.getItem('tabTitle')) document.title = localStorage.getItem('tabTitle');
+      applyPageFavicon();
+    });
+
+    // Background color
+    document.getElementById('bg-color').addEventListener('input', e => {
+      body.style.backgroundColor = e.target.value;
+      localStorage.setItem('bgColor', e.target.value);
+    });
+
+    // Font color
+    document.getElementById('font-color').addEventListener('input', e => {
+      body.style.color = e.target.value;
+      localStorage.setItem('fontColor', e.target.value);
+    });
+
+    // Font style
+    document.getElementById('font-style').addEventListener('change', e => {
+      body.style.fontFamily = e.target.value;
+      localStorage.setItem('fontStyle', e.target.value);
+    });
+
+    // Background image
+    document.getElementById('bg-image').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const url = ev.target.result;
+          body.style.backgroundImage = `url(${url})`;
+          body.style.backgroundSize = 'cover';
+          body.style.backgroundPosition = 'center';
+          localStorage.setItem('bgImage', url);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // about:blank
+    document.getElementById('open-about-blank').addEventListener('click', () => {
+      const win = window.open('about:blank', '_blank');
+      const iframe = win.document.createElement('iframe');
+      iframe.src = location.href;
+      iframe.style.cssText = 'position:fixed;inset:0;border:none;width:100%;height:100%;';
+      win.document.body.appendChild(iframe);
+    });
+
+    // Tab cloak
+    document.getElementById('apply-cloak').addEventListener('click', () => {
+      const title = document.getElementById('tab-title').value.trim();
+      const favicon = document.getElementById('tab-favicon').value.trim();
+      if (title) {
+        document.title = title;
+        localStorage.setItem('tabTitle', title);
+      }
+      if (favicon) {
+        setFavicon(favicon);
+        localStorage.setItem('tabFavicon', favicon);
+      }
+    });
+
+    // Font glow
+    document.getElementById('font-glow').addEventListener('change', e => {
+      body.classList.toggle('font-glow', e.target.checked);
+      localStorage.setItem('fontGlow', e.target.checked);
+    });
+
+    // Nav position
+    document.getElementById('nav-position').addEventListener('change', e => {
+      const pos = e.target.value;
+      applyNavPosition(pos);
+      localStorage.setItem('navPosition', pos);
+    });
+
+    function applyNavPosition(pos) {
+      navBar.style.position = 'fixed';
+      navBar.style.transform = '';
+      navBar.style.flexDirection = 'row';
+      navBar.style.minWidth = '92vw';
+      navBar.style.width = 'auto';
+      navBar.style.height = 'auto';
+      navBar.style.minHeight = '';
+      navBar.style.borderRadius = '24px';
+
+      if (pos === 'top-center') {
+        navBar.style.top = '20px';
+        navBar.style.bottom = '';
+        navBar.style.left = '50%';
+        navBar.style.right = '';
+        navBar.style.transform = 'translateX(-50%)';
+      } else if (pos === 'bottom-center') {
+        navBar.style.top = '';
+        navBar.style.bottom = '20px';
+        navBar.style.left = '50%';
+        navBar.style.right = '';
+        navBar.style.transform = 'translateX(-50%)';
+      } else if (pos === 'left') {
+        navBar.style.top = '50%';
+        navBar.style.bottom = '';
+        navBar.style.left = '20px';
+        navBar.style.right = '';
+        navBar.style.transform = 'translateY(-50%)';
+        navBar.style.flexDirection = 'column';
+        navBar.style.minWidth = 'auto';
+        navBar.style.minHeight = '50vh';
+      } else if (pos === 'right') {
+        navBar.style.top = '50%';
+        navBar.style.bottom = '';
+        navBar.style.left = '';
+        navBar.style.right = '20px';
+        navBar.style.transform = 'translateY(-50%)';
+        navBar.style.flexDirection = 'column';
+        navBar.style.minWidth = 'auto';
+        navBar.style.minHeight = '50vh';
+      }
+    }
+
+    // Reset everything
+    document.getElementById('reset-settings').addEventListener('click', () => {
+      if (!confirm('Reset all settings to default?')) return;
+
+      localStorage.clear();
+
+      body.style.backgroundColor = '#87CEEB';
+      body.style.backgroundImage = '';
+      body.style.color = '#000000';
+      body.style.fontFamily = "'Fredoka', sans-serif";
+      body.classList.remove('font-glow');
+
+      document.getElementById('bg-color').value = '#87CEEB';
+      document.getElementById('font-color').value = '#000000';
+      document.getElementById('font-style').value = "'Fredoka', sans-serif";
+      document.getElementById('font-glow').checked = false;
+      document.getElementById('nav-position').value = 'top-center';
+      document.getElementById('tab-title').value = '';
+      document.getElementById('tab-favicon').value = '';
+
+      document.title = 'Arcady - 1.3.5';
+      applyPageFavicon();
+
+      applyNavPosition('top-center');
+      settingsPanel.style.display = 'none';
+    });
+
+    const nicknameInput = document.getElementById('nickname-input');
+    const nicknameSave = document.getElementById('nickname-save');
+
+    if (nicknameInput) {
+      nicknameInput.value = localStorage.getItem('arcadyVisitorNickname') || '';
+    }
+
+    if (nicknameSave && nicknameInput) {
+      const saveNickname = () => {
+        const nickname = nicknameInput.value.trim().slice(0, 24);
+        localStorage.setItem('arcadyVisitorNickname', nickname);
+        window.dispatchEvent(new CustomEvent('arcady:nickname-change', {
+          detail: { nickname: nickname }
+        }));
+      };
+
+      nicknameSave.addEventListener('click', saveNickname);
+      nicknameInput.addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+          saveNickname();
+        }
+      });
+    }
+  </script>
+  <script>
+    (function () {
+      const leaderboardScroll = document.getElementById('home-leaderboard-scroll');
+      const leaderboardMeta = document.getElementById('home-leaderboard-meta');
+      const leaderboardPath = 'arcadyAdmin/xp/users';
+      const appName = 'arcady-home-leaderboard';
+
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatXp(value) {
+        return Number(value || 0).toLocaleString() + ' XP';
+      }
+
+      function setLeaderboardMessage(message) {
+        if (!leaderboardScroll) return;
+        leaderboardScroll.innerHTML = '<div class="home-leaderboard-empty">' + escapeHtml(message) + '</div>';
+      }
+
+      function getFirebaseConfig() {
+        const runtimeConfig = window.ARCADY_ADMIN_FIREBASE || {};
+        return runtimeConfig.firebaseConfig || {};
+      }
+
+      function isValidFirebaseConfig(config) {
+        return config && config.apiKey && config.projectId && config.appId && config.databaseURL;
+      }
+
+      function loadScript(src) {
+        return new Promise(function (resolve, reject) {
+          const existing = document.querySelector('script[src="' + src + '"]');
+          if (existing) {
+            if (existing.dataset.loaded === 'true') {
+              resolve();
+              return;
+            }
+            existing.addEventListener('load', function () {
+              resolve();
+            });
+            existing.addEventListener('error', function () {
+              reject(new Error('Failed to load ' + src));
+            });
+            return;
+          }
+
+          const script = document.createElement('script');
+          script.src = src;
+          script.async = true;
+          script.addEventListener('load', function () {
+            script.dataset.loaded = 'true';
+            resolve();
+          });
+          script.addEventListener('error', function () {
+            reject(new Error('Failed to load ' + src));
+          });
+          document.head.appendChild(script);
+        });
+      }
+
+      function ensureFirebaseSdk() {
+        if (window.firebase && typeof window.firebase.initializeApp === 'function' && typeof window.firebase.database === 'function') {
+          return Promise.resolve();
+        }
+
+        return loadScript('https://www.gstatic.com/firebasejs/11.4.0/firebase-app-compat.js')
+          .then(function () {
+            return loadScript('https://www.gstatic.com/firebasejs/11.4.0/firebase-database-compat.js');
+          });
+      }
+
+      function getDatabase() {
+        const firebaseConfig = getFirebaseConfig();
+        if (!isValidFirebaseConfig(firebaseConfig)) {
+          throw new Error('Invalid Firebase configuration');
+        }
+
+        let app;
+        try {
+          app = window.firebase.app(appName);
+        } catch (error) {
+          app = window.firebase.initializeApp(firebaseConfig, appName);
+        }
+
+        return app.database();
+      }
+
+      function normalizeLeaderboardRecord(record, id) {
+        const nickname = String((record && record.nickname) || '').trim().slice(0, 24);
+        return {
+          id: id,
+          nickname: nickname || 'Guest',
+          xp: Number((record && record.xp) || 0)
+        };
+      }
+
+      async function fetchLeaderboardEntries() {
+        await ensureFirebaseSdk();
+        const db = getDatabase();
+        const snapshot = await db.ref(leaderboardPath).orderByChild('xp').limitToLast(25).once('value');
+        const raw = snapshot.val() || {};
+        return Object.entries(raw)
+          .map(function (entry) {
+            return normalizeLeaderboardRecord(entry[1], entry[0]);
+          })
+          .filter(function (entry) {
+            return entry.nickname && Number.isFinite(entry.xp);
+          })
+          .sort(function (a, b) {
+            return b.xp - a.xp;
+          });
+      }
+
+      async function renderLeaderboard() {
+        if (!leaderboardScroll) return;
+        setLeaderboardMessage('Loading leaderboard...');
+        leaderboardMeta.textContent = 'Sorted by XP';
+
+        const firebaseConfig = getFirebaseConfig();
+        if (!isValidFirebaseConfig(firebaseConfig)) {
+          setLeaderboardMessage('Leaderboard is unavailable right now.');
+          return;
+        }
+
+        try {
+          const entries = await fetchLeaderboardEntries();
+          if (!entries.length) {
+            setLeaderboardMessage('No XP leaderboard entries found yet.');
+            return;
+          }
+
+          leaderboardMeta.textContent = 'Sorted by XP · top ' + entries.length;
+          leaderboardScroll.innerHTML = entries.map(function (entry, index) {
+            return (
+              '<div class="home-leaderboard-entry" style="display:flex; align-items:center; gap:10px;">' +
+                '<div class="home-leaderboard-rank">' + (index + 1) + '</div>' +
+                '<div class="home-leaderboard-name" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + escapeHtml(entry.nickname) + '</div>' +
+                '<div class="home-leaderboard-xp" style="white-space:nowrap;">' + formatXp(entry.xp) + '</div>' +
+              '</div>'
+            );
+          }).join('');
+        } catch (error) {
+          console.error('Arcady leaderboard failed to load:', error);
+          setLeaderboardMessage('Unable to load leaderboard.');
+        }
+      }
+
+      window.addEventListener('load', function () {
+        renderLeaderboard();
+      });
+      window.addEventListener('arcady:nickname-change', renderLeaderboard);
+      window.addEventListener('arcady:leaderboard-updated', renderLeaderboard);
+      window.addEventListener('arcady:owner-access-change', function () {
+        renderLeaderboard();
+      });
+    })();
+  </script>
+  <script>
+// Random subtitle rotator (only bottom text changes)
+const subtitles = [
+  "Totally Not From The Creator Of Arcadium...",
+  "Broo this was made less than a week",
+  "Unfiltered internet since breakfast",
+  "We have proxies and bad decisions",
+  "Jeffry Epstein? Ive never heard of him",
+  "Not approved by any school district",
+  "Ladies calm down",
+  "oozeeeeeeeeee approved",
+  "Incognito mode is for cowards",
+  "Made with spite and glitter",
+  "If the FBI is watching, hi mom!",
+  "Loading your daily dose of questionable content...",
+  "Certified 100% vibe-based",
+  "Press F13 to summon the void",
+  "This is probably fine",
+  "Error 418: I'm Gay",
+  "Banned in 47 countries (rumored)",
+  "Your honor, my client was just vibing",
+  "404: Motivation not found",
+  "Running on hopes and expired dreams",
+  "Corny ahh shyt",
+  "Theres a 1% chance u see this",
+  "Class of 067",
+  "Brooooo",
+  "I do this instead of my homework",
+  "I NEED EMPLOYEES",
+  "Frogies Arcade?",
+  "Dude Typical Productions was never peak",
+  "Ooze drooze club",
+  "Omes Typical Site Vs Oooze Crib",
+  "riurgrwibfuwebfwefwef",
+  "She gon call me baby boo",
+  "Gooning since i was born (:",
+  "HOLY LAG",
+  "#cornballs",
+  "Brocadium",
+  "Oooze likes to eat drooze",
+  "Plz request things ill add them for sure",
+  "Hey make sure to check out everythiing we offer",
+  "Grown ass man btw",
+  "DUDE 90% ZOOM IS THE BEST PLEASE TRY IT",
+  "THEY BANNED FASTLYYY NOOOO",
+  "ima kms",
+  "Good game well played",
+];
+
+function changeSubtitle() {
+  const el = document.getElementById("splash-subtitle");
+  if (!el) return;
+
+  el.classList.add("fade");
+
+  setTimeout(() => {
+    const randomIndex = Math.floor(Math.random() * subtitles.length);
+    el.textContent = subtitles[randomIndex];
+
+    el.classList.remove("fade");
+  }, 1200); // time matches the CSS fade transition
+}
+
+setInterval(changeSubtitle, 5000);
+
+setTimeout(changeSubtitle, 5000);
+  </script>
+  <script>
+    (function () {
+      const modal = document.getElementById('iframe-modal');
+      const iframe = document.getElementById('modal-iframe');
+      const modalClose = modal && modal.querySelector('.modal-close');
+      const btnRefresh = document.getElementById('btn-refresh');
+      const btnFullscreen = document.getElementById('btn-fullscreen');
+      const btnNewTab = document.getElementById('btn-new-tab');
+      if (!modal || !iframe || !modalClose) return;
+
+      let currentUrl = '';
+
+      function closeModal() {
+        modal.style.display = 'none';
+        iframe.src = 'about:blank';
+        document.body.style.overflow = '';
+      }
+
+      modalClose.addEventListener('click', closeModal);
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+      });
+
+      if (btnRefresh) {
+        btnRefresh.addEventListener('click', function () {
+          if (currentUrl) iframe.src = currentUrl;
+        });
+      }
+      if (btnNewTab) {
+        btnNewTab.addEventListener('click', function () {
+          if (currentUrl) window.open(currentUrl, '_blank');
+          closeModal();
+        });
+      }
+      if (btnFullscreen) {
+        btnFullscreen.addEventListener('click', function () {
+          if (iframe.requestFullscreen) iframe.requestFullscreen();
+          else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+          else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
+        });
+      }
+    })();
+  </script>
+  <script src="./features/admin/firebase-config.js?v=10"></script>
+  <script src="./features/admin/site-admin.js?v=11"></script>
+  <script src="./features/home/home-chat.js?v=6"></script>
+  <script>
+    (function () {
+      const petStateKey = 'arcadyHomePetState';
+      const petAssetsBase = 'https://cdn.jsdelivr.net/gh/arcady-web/arcady-web.github.io@main/features/pets/';
+      const petVariants = [
+        { name: '67 Froggy', file: '67 Froggy.webp' },
+        { name: 'Allay', file: 'Allay.gif' },
+        { name: 'Boo', file: 'Boo.gif' },
+        { name: 'Bunny', file: 'Bunny.gif' },
+        { name: 'Doge', file: 'Doge.gif' },
+        { name: 'Doggie', file: 'Doggie.gif' },
+        { name: 'Duck', file: 'Duck.gif' },
+        { name: 'Fox', file: 'Fox.gif' },
+        { name: 'Froggy', file: 'froggy.png' },
+        { name: 'Froggy Distortion', file: 'Froggy distortion.png' },
+        { name: 'Gan Gar', file: 'Gan Gar.gif' },
+        { name: 'Ghost', file: 'Ghost.gif' },
+        { name: 'Happy Shit', file: 'Happy Shit.gif' },
+        { name: 'Hello Kity', file: 'Hello Kity.gif' },
+        { name: 'Kittens', file: 'Kittens.gif' },
+        { name: 'Mew', file: 'Mew.gif' },
+        { name: 'Mew 1', file: 'Mew 1.gif' },
+        { name: 'Miku', file: 'Miku.gif' },
+        { name: 'Monkey', file: 'Monkey.jpg' },
+        { name: 'Ooze Dog Eating Froggy', file: 'Ooze Dog Eating Froggy.png' },
+        { name: 'oozelogo', file: 'oozelogo.png' },
+        { name: 'Panda', file: 'Panda.gif' },
+        { name: 'Pigeon', file: 'Pigeon.gif' },
+        { name: 'Pink Pikachu', file: 'Pink Pikachu.gif' },
+        { name: 'Random Anime Girls', file: 'Random Anime Girls.gif' },
+        { name: 'Sad Dog', file: 'Sad Dog.gif' },
+        { name: 'Sheep', file: 'Sheep.gif' },
+        { name: 'Silly Froggy', file: 'Silly Froggy.jpg' },
+        { name: 'Skelly Smoking', file: 'Skelly Smoking.gif' },
+        { name: 'Snorlax', file: 'Snorlax.gif' },
+        { name: 'Spider', file: 'Spider.gif' },
+        { name: 'Star', file: 'Star.gif' },
+        { name: 'Ugly Froggy', file: 'Ugly Froggy.png' },
+        { name: 'Minecraft Bee', file: 'Bee.png' },
+        { name: 'Flying Car', file: 'Phanthom.gif' },
+      ];
+
+      function getPetImagePath(state) {
+        if (state && state.imageFile) {
+          return petAssetsBase + state.imageFile;
+        }
+        if (state && state.image) {
+          return state.image;
+        }
+        return petAssetsBase + petVariants[0].file;
+      }
+
+      const petElements = {
+        hatchButton: document.getElementById('pet-hatch-button'),
+        petTitle: document.getElementById('pet-title'),
+        petStatus: document.getElementById('pet-status'),
+        petMeta: document.getElementById('pet-meta'),
+        petControls: document.getElementById('pet-controls-panel'),
+        petNameInput: document.getElementById('pet-name-input'),
+        petNameSave: document.getElementById('pet-name-save'),
+        petAgeText: document.getElementById('pet-age-text'),
+        petHungerText: document.getElementById('pet-hunger-text'),
+        petAffectionText: document.getElementById('pet-affection-text'),
+        petFeedButton: document.getElementById('pet-feed-btn'),
+        petPetButton: document.getElementById('pet-pet-btn'),
+        petAdventureButton: document.getElementById('pet-adventure-btn'),
+        petEggSlot: document.getElementById('pet-egg-slot'),
+        followContainer: document.getElementById('pet-follow-container'),
+        followImage: document.getElementById('pet-follow-image')
+      };
+
+      const petImagePreview = document.createElement('img');
+      petImagePreview.className = 'pet-image-preview';
+      petImagePreview.alt = 'Your pet frog';
+
+      let petState = {
+        hatched: false,
+        name: '',
+        age: 0,
+        hunger: 100,
+        affection: 50,
+        adventure: false,
+        imageFile: null,
+        image: '',
+        lastActive: Date.now()
+      };
+
+      let targetPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      let currentPos = { x: targetPos.x, y: targetPos.y };
+      let animationFrame = null;
+
+      function savePetState() {
+        localStorage.setItem(petStateKey, JSON.stringify(petState));
+        window.dispatchEvent(new CustomEvent('arcadyPetStateChanged'));
+      }
+
+      function loadPetState() {
+        const saved = localStorage.getItem(petStateKey);
+        if (!saved) return;
+        try {
+          const parsed = JSON.parse(saved);
+          petState = Object.assign(petState, parsed);
+          if (!petState.imageFile && petState.image && petState.image.startsWith(petAssetsBase)) {
+            const match = petState.image.match(/[^/]+$/);
+            if (match) {
+              petState.imageFile = match[0];
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to load pet state:', error);
+        }
+      }
+
+      function getPetName() {
+        return petState.name || 'Froggy';
+      }
+
+      function choosePetImage() {
+        return petVariants[Math.floor(Math.random() * petVariants.length)];
+      }
+
+      function updatePetAudience() {
+        if (petState.imageFile && !petState.image) {
+          petState.image = getPetImagePath(petState);
+        }
+        if (!petState.hatched) {
+          return 'A frog egg waits in the shell. Hatch it to begin your adventure.';
+        }
+        if (petState.adventure) {
+          return `${getPetName()} is following your cursor and exploring with you.`;
+        }
+        return `${getPetName()} is waiting for your next adventure.`;
+      }
+
+      function updatePetDisplay() {
+        if (petState.imageFile && !petState.image) {
+          petState.image = getPetImagePath(petState);
+        }
+        if (!petElements.petTitle) return;
+
+        if (!petState.hatched) {
+          petElements.petTitle.textContent = 'Egg ready';
+          petElements.petStatus.textContent = 'A frog egg waits in the shell. Hatch it to begin your adventure.';
+          petElements.petMeta.textContent = 'Name your frog, feed it, and send it on adventures.';
+          petElements.petEggSlot.textContent = '🥚';
+          petElements.petControls.hidden = true;
+          petElements.hatchButton.textContent = 'Hatch egg';
+          petElements.followContainer.hidden = true;
+          stopFollow();
+          return;
+        }
+
+        petElements.petControls.hidden = false;
+        petElements.petTitle.textContent = `${getPetName()} · Age ${petState.age}`;
+        petElements.petStatus.textContent = updatePetAudience();
+        petElements.petMeta.textContent = 'Set your pet nickname and use the buttons below to care for it.';
+        petElements.petAgeText.textContent = `Age: ${petState.age}`;
+        petElements.petHungerText.textContent = `Hunger: ${petState.hunger}%`;
+        petElements.petAffectionText.textContent = `Affection: ${petState.affection}%`;
+        petElements.hatchButton.textContent = 'Rewatch egg';
+
+        if (petState.hunger <= 20) {
+          petElements.petStatus.textContent = `${getPetName()} is hungry and needs a snack.`;
+        }
+
+        if (petState.adventure) {
+          petElements.petAdventureButton.textContent = 'Stop adventure';
+          const sharedFollow = document.getElementById('page-pet-follow-overlay');
+          if (sharedFollow) {
+            petElements.followContainer.hidden = true;
+            stopFollow();
+          } else {
+            petElements.followContainer.hidden = false;
+            petElements.followImage.src = getPetImagePath(petState);
+            if (!animationFrame) startFollow();
+          }
+        } else {
+          petElements.petAdventureButton.textContent = 'Adventure';
+          petElements.followContainer.hidden = true;
+          stopFollow();
+        }
+
+        petElements.petEggSlot.innerHTML = '';
+        petImagePreview.src = getPetImagePath(petState);
+        petImagePreview.alt = `Pet ${getPetName()}`;
+        petElements.petEggSlot.appendChild(petImagePreview);
+      }
+
+      function hatchPet() {
+        const variant = choosePetImage();
+        petState.hatched = true;
+        petState.name = petState.name || variant.name;
+        petState.imageFile = variant.file;
+        petState.image = getPetImagePath(petState);
+        petState.age = 0;
+        petState.hunger = 100;
+        petState.affection = 60;
+        petState.adventure = false;
+        petState.lastActive = Date.now();
+        petElements.petStatus.textContent = `You hatched ${getPetName()}!`;
+        savePetState();
+        updatePetDisplay();
+      }
+
+      function changePetName() {
+        const value = petElements.petNameInput.value.trim().slice(0, 16);
+        if (!value) {
+          petElements.petStatus.textContent = 'Pick a name before saving your pet.';
+          return;
+        }
+        petState.name = value;
+        savePetState();
+        updatePetDisplay();
+      }
+
+      function feedPet() {
+        if (!petState.hatched) return;
+        petState.hunger = Math.min(100, petState.hunger + 25);
+        petState.affection = Math.min(100, petState.affection + 5);
+        petState.lastActive = Date.now();
+        petElements.petStatus.textContent = `You fed ${getPetName()}. It looks happier!`;
+        savePetState();
+        updatePetDisplay();
+      }
+
+      function petPet() {
+        if (!petState.hatched) return;
+        petState.affection = Math.min(100, petState.affection + 17);
+        petState.lastActive = Date.now();
+        petElements.petStatus.textContent = `You petted ${getPetName()}. It loves the attention!`;
+        savePetState();
+        updatePetDisplay();
+      }
+
+      function toggleAdventure() {
+        if (!petState.hatched) return;
+        petState.adventure = !petState.adventure;
+        petState.lastActive = Date.now();
+        savePetState();
+        updatePetDisplay();
+      }
+
+      function startFollow() {
+        if (animationFrame) return;
+        const animate = () => {
+          currentPos.x += (targetPos.x - currentPos.x) * 0.16;
+          currentPos.y += (targetPos.y - currentPos.y) * 0.16;
+          petElements.followContainer.style.transform = `translate3d(${currentPos.x}px, ${currentPos.y}px, 0)`;
+          animationFrame = requestAnimationFrame(animate);
+        };
+        animate();
+      }
+
+      function stopFollow() {
+        if (animationFrame) {
+          cancelAnimationFrame(animationFrame);
+          animationFrame = null;
+        }
+      }
+
+      function tickPetTime() {
+        if (!petState.hatched || document.visibilityState !== 'visible') return;
+        const now = Date.now();
+        const seconds = Math.floor((now - petState.lastActive) / 1000);
+        if (seconds < 30) return;
+        petState.lastActive = now;
+        petState.age += 1;
+        petState.hunger = Math.max(0, petState.hunger - 5);
+        petState.affection = Math.max(0, petState.affection - 1);
+        savePetState();
+        updatePetDisplay();
+      }
+
+      loadPetState();
+      if (petElements.petNameInput && petState.name) {
+        petElements.petNameInput.value = petState.name;
+      }
+      updatePetDisplay();
+
+      if (petElements.hatchButton) {
+        petElements.hatchButton.addEventListener('click', hatchPet);
+      }
+      if (petElements.petNameSave) {
+        petElements.petNameSave.addEventListener('click', changePetName);
+      }
+      if (petElements.petFeedButton) {
+        petElements.petFeedButton.addEventListener('click', feedPet);
+      }
+      if (petElements.petPetButton) {
+        petElements.petPetButton.addEventListener('click', petPet);
+      }
+      if (petElements.petAdventureButton) {
+        petElements.petAdventureButton.addEventListener('click', toggleAdventure);
+      }
+
+      window.addEventListener('pointermove', event => {
+        targetPos.x = event.clientX + 14;
+        targetPos.y = event.clientY + 14;
+      }, { passive: true });
+
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          petState.lastActive = Date.now();
+        }
+      });
+
+      window.addEventListener('storage', function (event) {
+        if (event.key === petStateKey) {
+          loadPetState();
+          if (petElements.petNameInput && petState.name) {
+            petElements.petNameInput.value = petState.name;
+          }
+          updatePetDisplay();
+        }
+      });
+
+      window.addEventListener('arcadyPetStateChanged', function () {
+        loadPetState();
+        if (petElements.petNameInput && petState.name) {
+          petElements.petNameInput.value = petState.name;
+        }
+        updatePetDisplay();
+      });
+
+      setInterval(tickPetTime, 5000);
+    })();
+  </script>
+  <script src="./features/shared-more-windows.js?v=1"></script>
+  <script src="./features/broadcast-more-notify.js?v=1"></script>
+  <script>
+    // Reduce memory by lazy-loading media where possible
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        document.querySelectorAll('img').forEach(function (img) {
+          if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+        });
+        document.querySelectorAll('iframe').forEach(function (iframe) {
+          if (!iframe.hasAttribute('loading')) iframe.setAttribute('loading', 'lazy');
+        });
+      } catch (e) {
+        // best-effort
+        console.warn('Lazy-load init failed', e);
+      }
+    });
+  </script>
+</body>
+</html>
