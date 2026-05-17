@@ -120,7 +120,7 @@
   let typingTimer = null;
   let highlighted = null;
   let typedDone = true;
-  let sidebarHighlight = null;
+  let sidebarOutlineEl = null;
 
   function ensureStyles() {
     if (document.getElementById("chicken-tour-styles")) return;
@@ -259,10 +259,13 @@
         border-radius: 22px !important;
       }
 
-      .chicken-tour-target-sidebar {
-        position: relative !important;
-        z-index: 10000 !important;
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #ffffff) 85%, white), 0 0 0 14px color-mix(in srgb, var(--accent-soft, rgba(255,255,255,0.14)) 88%, transparent) !important;
+      .chicken-tour-sidebar-outline {
+        position: fixed;
+        border-radius: 22px;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #ffffff) 85%, white), 0 0 0 14px color-mix(in srgb, var(--accent-soft, rgba(255,255,255,0.14)) 88%, transparent);
+        pointer-events: none;
+        z-index: 10000;
+        display: none;
       }
 
       @media (max-width: 760px) {
@@ -300,6 +303,7 @@
     tourRoot.hidden = true;
     tourRoot.innerHTML = `
       <div class="chicken-tour-scrim"></div>
+      <div class="chicken-tour-sidebar-outline" aria-hidden="true"></div>
       <div class="chicken-tour-panel">
         <div class="chicken-tour-mascot-box">
           <img alt="Chicken mascot" />
@@ -322,6 +326,7 @@
 
     scrim = tourRoot.querySelector(".chicken-tour-scrim");
     panel = tourRoot.querySelector(".chicken-tour-panel");
+    sidebarOutlineEl = tourRoot.querySelector(".chicken-tour-sidebar-outline");
     mascotEl = tourRoot.querySelector("img");
     titleEl = tourRoot.querySelector(".chicken-tour-title");
     textEl = tourRoot.querySelector(".chicken-tour-text");
@@ -357,9 +362,8 @@
       highlighted.classList.remove("chicken-tour-target");
       highlighted = null;
     }
-    if (sidebarHighlight) {
-      sidebarHighlight.classList.remove("chicken-tour-target-sidebar");
-      sidebarHighlight = null;
+    if (sidebarOutlineEl) {
+      sidebarOutlineEl.style.display = "none";
     }
   }
 
@@ -391,7 +395,16 @@
   }
 
   function refreshPosition() {
-    return;
+    const step = STEPS[getStepIndex()];
+    if (!step || !(step.selector || "").includes("-tab") || !sidebarOutlineEl) return;
+    const sidebar = document.querySelector(".sidebar");
+    if (!sidebar) return;
+    const rect = sidebar.getBoundingClientRect();
+    sidebarOutlineEl.style.display = "block";
+    sidebarOutlineEl.style.left = `${rect.left}px`;
+    sidebarOutlineEl.style.top = `${rect.top}px`;
+    sidebarOutlineEl.style.width = `${rect.width}px`;
+    sidebarOutlineEl.style.height = `${rect.height}px`;
   }
 
   function bindTargetAdvance(step, target) {
@@ -432,10 +445,7 @@
       if (target) {
         target.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
         if ((step.selector || "").includes("-tab")) {
-          sidebarHighlight = document.querySelector(".sidebar");
-          if (sidebarHighlight) {
-            sidebarHighlight.classList.add("chicken-tour-target-sidebar");
-          }
+          refreshPosition();
         } else {
           target.classList.add("chicken-tour-target");
           highlighted = target;
