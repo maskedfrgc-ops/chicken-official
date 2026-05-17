@@ -7,47 +7,62 @@
       id: "classlink",
       label: "ClassLink",
       title: "ClassLink LaunchPad",
-      icon: "https://www.google.com/s2/favicons?domain=myapps.classlink.com&sz=64",
+      icon: "https://myapps.classlink.com/favicon.ico",
       url: "https://myapps.classlink.com/home"
     },
     {
       id: "ixl",
       label: "IXL",
       title: "IXL | Dashboard",
-      icon: "https://www.google.com/s2/favicons?domain=www.ixl.com&sz=64",
+      icon: "https://www.ixl.com/favicon.ico",
       url: "https://www.ixl.com/dashboard"
     },
     {
       id: "schoology",
       label: "Schoology",
       title: "Home | Schoology",
-      icon: "https://www.google.com/s2/favicons?domain=cfisd.schoology.com&sz=64",
+      icon: "https://cfisd.schoology.com/favicon.ico",
       url: "https://cfisd.schoology.com/home"
     },
     {
       id: "desmos",
       label: "Desmos",
       title: "Desmos | Graphing Calculator",
-      icon: "https://www.google.com/s2/favicons?domain=www.desmos.com&sz=64",
+      icon: "https://www.desmos.com/favicon.ico",
       url: "https://www.desmos.com/calculator"
     }
   ];
 
-  function ensureFavicon() {
-    let link = document.querySelector("link[rel='icon']");
-    if (!link) {
-      link = document.createElement("link");
+  function ensureFaviconLinks() {
+    const selectors = [
+      "link[rel='icon']",
+      "link[rel='shortcut icon']",
+      "link[rel='apple-touch-icon']"
+    ];
+    const links = selectors
+      .map((selector) => Array.from(document.querySelectorAll(selector)))
+      .flat();
+
+    if (!links.length) {
+      const link = document.createElement("link");
       link.rel = "icon";
       document.head.appendChild(link);
+      return [link];
     }
-    return link;
+
+    return links;
   }
 
   function applySavedCloak() {
     const savedTitle = localStorage.getItem(TITLE_KEY);
     const savedIcon = localStorage.getItem(ICON_KEY);
     if (savedTitle) document.title = savedTitle;
-    if (savedIcon) ensureFavicon().href = savedIcon;
+    if (savedIcon) {
+      const href = `${savedIcon}${savedIcon.includes("?") ? "&" : "?"}v=${Date.now()}`;
+      ensureFaviconLinks().forEach((link) => {
+        link.href = href;
+      });
+    }
   }
 
   function saveCloak(cloak) {

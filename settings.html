@@ -151,9 +151,6 @@
     font: inherit;
     outline: none;
     margin-bottom: 12px;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
   }
 
   .select-wrap {
@@ -162,19 +159,73 @@
   }
 
   .select-wrap select {
-    margin-bottom: 0;
-    padding-right: 48px;
+    display: none;
   }
 
-  .select-wrap::after {
+  .chicken-select {
+    position: relative;
+  }
+
+  .chicken-select-trigger {
+    width: 100%;
+    background: var(--input);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 14px;
+    padding: 14px 16px;
+    font: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 0;
+  }
+
+  .chicken-select-trigger::after {
     content: '▾';
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
     color: var(--muted);
-    pointer-events: none;
     font-size: 14px;
+  }
+
+  .chicken-select.is-open .chicken-select-trigger {
+    background: var(--card-hover);
+  }
+
+  .chicken-select-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: color-mix(in srgb, var(--panel) 94%, rgba(0,0,0,0.92));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    backdrop-filter: blur(24px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+    display: none;
+    z-index: 50;
+  }
+
+  .chicken-select.is-open .chicken-select-menu {
+    display: block;
+  }
+
+  .chicken-select-option {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    padding: 13px 16px;
+    transition: background 0.2s ease;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .chicken-select-option:hover,
+  .chicken-select-option.is-active {
+    background: var(--accent-soft);
   }
 
   button {
@@ -331,6 +382,52 @@ const proxyStatus=document.getElementById("proxyStatus");
 const themeSelect=document.getElementById("themeSelect");
 const themeStatus=document.getElementById("themeStatus");
 const PROXY_SETTING_KEY="proxyBackend";
+function enhanceSelect(select){
+  if(!select || select.dataset.enhanced==="true") return;
+  select.dataset.enhanced="true";
+  const wrap=select.parentElement;
+  const shell=document.createElement("div");
+  shell.className="chicken-select";
+  const trigger=document.createElement("button");
+  trigger.type="button";
+  trigger.className="chicken-select-trigger";
+  const menu=document.createElement("div");
+  menu.className="chicken-select-menu";
+  shell.appendChild(trigger);
+  shell.appendChild(menu);
+  wrap.appendChild(shell);
+  const options=Array.from(select.options);
+  function syncLabel(){
+    const current=select.options[select.selectedIndex];
+    trigger.textContent=current?current.textContent:"select";
+    Array.from(menu.children).forEach((node,index)=>{
+      node.classList.toggle("is-active", index===select.selectedIndex);
+    });
+  }
+  options.forEach((option,index)=>{
+    const button=document.createElement("button");
+    button.type="button";
+    button.className="chicken-select-option";
+    button.textContent=option.textContent;
+    button.addEventListener("click",()=>{
+      select.selectedIndex=index;
+      select.dispatchEvent(new Event("change",{bubbles:true}));
+      shell.classList.remove("is-open");
+      syncLabel();
+    });
+    menu.appendChild(button);
+  });
+  trigger.addEventListener("click",()=>{
+    document.querySelectorAll(".chicken-select.is-open").forEach(node=>{
+      if(node!==shell) node.classList.remove("is-open");
+    });
+    shell.classList.toggle("is-open");
+  });
+  document.addEventListener("click",(event)=>{
+    if(!shell.contains(event.target)) shell.classList.remove("is-open");
+  });
+  syncLabel();
+}
 function getSavedProxyBackend(){
   const savedValue=localStorage.getItem(PROXY_SETTING_KEY);
   if(savedValue==="auto"){
@@ -359,6 +456,7 @@ function updateAdSetting(s){
   alert(`ads are now ${s?"on":"off"}.\nshould work now`);
 }
 window.addEventListener("load",()=>{
+  document.querySelectorAll(".select-wrap select").forEach(enhanceSelect);
   const e=localStorage.getItem("adsEnabled");
   const s=e===null?true:e==="true";
   adsToggle.checked=s;
