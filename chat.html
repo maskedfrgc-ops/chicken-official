@@ -272,16 +272,6 @@
             word-break: break-word;
         }
 
-        .message-guide {
-            margin-top: 10px;
-            width: 112px;
-            height: 112px;
-            border-radius: 20px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            padding: 10px;
-        }
-
         .composer {
             display: grid;
             gap: 12px;
@@ -479,10 +469,7 @@
                     <textarea id="messageInput" placeholder="Type your message..."></textarea>
                     <div class="composer-actions">
                         <div class="status" id="chatStatus">connecting...</div>
-                        <div>
-                            <button class="secondary-btn" id="sendGuideButton" type="button">send guide</button>
-                            <button class="primary-btn" id="sendButton" type="button">send</button>
-                        </div>
+                        <button class="primary-btn" id="sendButton" type="button">send</button>
                     </div>
                 </div>
             </section>
@@ -515,7 +502,6 @@
     </div>
 
     <script src="./js/cloak.js"></script>
-    <script src="./js/guide-style.js"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js';
         import {
@@ -546,7 +532,6 @@
         const chatStatus = document.getElementById('chatStatus');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
-        const sendGuideButton = document.getElementById('sendGuideButton');
         const authOverlay = document.getElementById('authOverlay');
         const registerModeButton = document.getElementById('registerModeButton');
         const loginModeButton = document.getElementById('loginModeButton');
@@ -613,27 +598,16 @@
         function addMessage(message) {
             const card = document.createElement('div');
             card.className = 'message';
-            const avatar = document.createElement('img');
-            avatar.className = 'avatar';
-            avatar.src = message.avatar || './assets/chat.svg';
-            avatar.alt = '';
-            const body = document.createElement('div');
-            body.className = 'message-body';
-            body.innerHTML = `
-                <div class="message-head">
-                    <span class="message-user">${escapeHtml(message.username)}</span>
-                    <span class="message-time">${escapeHtml(formatTime(message.createdAt))}</span>
+            card.innerHTML = `
+                <img class="avatar" src="${escapeHtml(message.avatar || './assets/chat.svg')}" alt="">
+                <div class="message-body">
+                    <div class="message-head">
+                        <span class="message-user">${escapeHtml(message.username)}</span>
+                        <span class="message-time">${escapeHtml(formatTime(message.createdAt))}</span>
+                    </div>
+                    <div class="message-text">${escapeHtml(message.text)}</div>
                 </div>
-                ${message.text ? `<div class="message-text">${escapeHtml(message.text)}</div>` : ''}
             `;
-            if (message.guideConfig && window.CHICKEN_GUIDE) {
-                const guideEl = document.createElement('div');
-                guideEl.className = 'message-guide';
-                window.CHICKEN_GUIDE.render(guideEl, message.guideConfig, { size: 92 });
-                body.appendChild(guideEl);
-            }
-            card.appendChild(avatar);
-            card.appendChild(body);
             messagesEl.appendChild(card);
             messagesEl.scrollTop = messagesEl.scrollHeight;
         }
@@ -658,8 +632,7 @@
                         text: data.text || '',
                         createdAt: data.createdAt?.toDate?.()?.toISOString?.() || new Date().toISOString(),
                         username: data.username || 'unknown',
-                        avatar: data.avatar || './assets/chat.svg',
-                        guideConfig: data.guideConfig || null
+                        avatar: data.avatar || './assets/chat.svg'
                     };
                 });
                 renderMessages(messages);
@@ -746,18 +719,6 @@
             messageInput.value = '';
         }
 
-        async function sendGuide() {
-            if (!account || !window.CHICKEN_GUIDE) return;
-            await addDoc(collection(db, 'messages'), {
-                text: '',
-                userId: account.id,
-                username: account.username,
-                avatar: account.avatar || './assets/chat.svg',
-                guideConfig: window.CHICKEN_GUIDE.getConfig(),
-                createdAt: serverTimestamp()
-            });
-        }
-
         avatarInput.addEventListener('change', () => {
             const file = avatarInput.files && avatarInput.files[0];
             if (!file) {
@@ -780,7 +741,6 @@
         authSubmitButton.addEventListener('click', submitAuth);
         logoutButton.addEventListener('click', logout);
         sendButton.addEventListener('click', sendMessage);
-        sendGuideButton.addEventListener('click', sendGuide);
         messageInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault();
