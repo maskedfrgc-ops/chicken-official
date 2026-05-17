@@ -241,6 +241,18 @@
         <p id="proxyStatus"></p>
       </section>
 
+      <section id="themesettings" class="settings-section">
+        <h2>color theme</h2>
+        <p>change the colors for the whole site</p>
+        <select id="themeSelect">
+          <option value="chicken">chicken</option>
+          <option value="blueprint">blueprint blue</option>
+          <option value="ember">ember orange</option>
+          <option value="forest">forest green</option>
+        </select>
+        <p id="themeStatus"></p>
+      </section>
+
       <section id="mobilesettings" class="settings-section">
         <h2>mobile mode</h2>
         <p>optimize games for mobile devices</p>
@@ -284,6 +296,8 @@ const adsToggle=document.getElementById("adsToggle");
 const adsStatus=document.getElementById("adsStatus");
 const proxySelect=document.getElementById("proxySelect");
 const proxyStatus=document.getElementById("proxyStatus");
+const themeSelect=document.getElementById("themeSelect");
+const themeStatus=document.getElementById("themeStatus");
 const PROXY_SETTING_KEY="proxyBackend";
 function getSavedProxyBackend(){
   const savedValue=localStorage.getItem(PROXY_SETTING_KEY);
@@ -304,6 +318,9 @@ function updateProxySetting(value){
   localStorage.setItem(PROXY_SETTING_KEY,value);
   updateProxyStatus(value);
 }
+function updateThemeStatus(value){
+  themeStatus.textContent=`${value} theme is active.`;
+}
 function updateAdSetting(s){
   localStorage.setItem("adsEnabled",s);
   adsStatus.textContent=s?"ads are on.":"ads are off.";
@@ -317,9 +334,16 @@ window.addEventListener("load",()=>{
   const proxyBackend=getSavedProxyBackend();
   proxySelect.value=proxyBackend;
   updateProxyStatus(proxyBackend);
+  const themeName=window.getChickenTheme?window.getChickenTheme():"chicken";
+  themeSelect.value=themeName;
+  updateThemeStatus(themeName);
 });
 adsToggle.addEventListener("change",()=>{updateAdSetting(adsToggle.checked);});
 proxySelect.addEventListener("change",()=>{updateProxySetting(proxySelect.value);});
+themeSelect.addEventListener("change",()=>{
+  if(window.setChickenTheme) window.setChickenTheme(themeSelect.value);
+  updateThemeStatus(themeSelect.value);
+});
 function openInAboutBlank() {
   const currentUrl = window.location.href;
   const aboutBlankWindow = window.open('about:blank', '_blank');
