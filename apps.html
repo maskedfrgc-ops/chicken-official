@@ -24,10 +24,10 @@
         .search-wrap { width: min(560px, 100%); margin: 0 auto 26px; position: relative; }
         .search { width: 100%; margin-bottom: 24px; }
         .search input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: white; border-radius: 16px; padding: 16px 18px; font: inherit; outline: none; }
-        .search-suggestions { position: absolute; top: calc(100% + 10px); left: 0; right: 0; background: rgba(24,24,24,0.96); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; backdrop-filter: blur(24px); overflow: hidden; display: none; z-index: 15; }
+        .search-suggestions { position: absolute; top: calc(100% + 10px); left: 0; right: 0; background: var(--suggestion-bg, rgba(24,24,24,0.96)); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; backdrop-filter: blur(24px); overflow: hidden; display: none; z-index: 15; }
         .search-suggestions.show { display: block; }
         .suggestion-button { width: 100%; border: none; background: transparent; color: white; text-align: left; padding: 12px 14px; font: inherit; cursor: pointer; transition: background 0.2s ease; display: flex; align-items: center; gap: 12px; }
-        .suggestion-button:hover, .suggestion-button.active { background: rgba(255,255,255,0.08); }
+        .suggestion-button:hover, .suggestion-button.active { background: var(--suggestion-hover, rgba(255,255,255,0.08)); }
         .suggestion-thumb { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; flex: 0 0 auto; background: rgba(255,255,255,0.06); }
         .suggestion-label { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .count { margin-bottom: 20px; font-size: 14px; }

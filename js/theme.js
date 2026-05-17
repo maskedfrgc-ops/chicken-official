@@ -12,7 +12,11 @@
       muted: "rgba(255, 255, 255, 0.64)",
       input: "rgba(255, 255, 255, 0.07)",
       accent: "#ffffff",
-      accentSoft: "rgba(255, 255, 255, 0.14)"
+      accentSoft: "rgba(255, 255, 255, 0.14)",
+      themeImage: "",
+      themeOverlay: "rgba(0, 0, 0, 0)",
+      suggestionBg: "rgba(24, 24, 24, 0.96)",
+      suggestionHover: "rgba(255, 255, 255, 0.08)"
     },
     blueprint: {
       bg: "#102338",
@@ -25,7 +29,11 @@
       muted: "rgba(214, 240, 255, 0.74)",
       input: "rgba(125, 194, 255, 0.10)",
       accent: "#8ed1ff",
-      accentSoft: "rgba(142, 209, 255, 0.18)"
+      accentSoft: "rgba(142, 209, 255, 0.18)",
+      themeImage: "",
+      themeOverlay: "rgba(4, 18, 32, 0.16)",
+      suggestionBg: "rgba(10, 30, 50, 0.96)",
+      suggestionHover: "rgba(142, 209, 255, 0.14)"
     },
     ember: {
       bg: "#1f1412",
@@ -38,7 +46,11 @@
       muted: "rgba(255, 217, 201, 0.72)",
       input: "rgba(255, 156, 102, 0.10)",
       accent: "#ff9c66",
-      accentSoft: "rgba(255, 156, 102, 0.18)"
+      accentSoft: "rgba(255, 156, 102, 0.18)",
+      themeImage: "",
+      themeOverlay: "rgba(20, 8, 5, 0.18)",
+      suggestionBg: "rgba(38, 17, 12, 0.96)",
+      suggestionHover: "rgba(255, 156, 102, 0.14)"
     },
     forest: {
       bg: "#101d17",
@@ -51,7 +63,45 @@
       muted: "rgba(205, 243, 219, 0.72)",
       input: "rgba(120, 217, 156, 0.10)",
       accent: "#78d99c",
-      accentSoft: "rgba(120, 217, 156, 0.18)"
+      accentSoft: "rgba(120, 217, 156, 0.18)",
+      themeImage: "",
+      themeOverlay: "rgba(6, 18, 11, 0.16)",
+      suggestionBg: "rgba(11, 31, 20, 0.96)",
+      suggestionHover: "rgba(120, 217, 156, 0.14)"
+    },
+    hacker: {
+      bg: "#040805",
+      panel: "rgba(7, 20, 11, 0.82)",
+      card: "rgba(34, 255, 136, 0.08)",
+      cardHover: "rgba(34, 255, 136, 0.14)",
+      grid: "rgba(34, 255, 136, 0.08)",
+      border: "rgba(34, 255, 136, 0.20)",
+      text: "#dfffe9",
+      muted: "rgba(123, 255, 176, 0.74)",
+      input: "rgba(34, 255, 136, 0.08)",
+      accent: "#22ff88",
+      accentSoft: "rgba(34, 255, 136, 0.18)",
+      themeImage: "",
+      themeOverlay: "rgba(0, 10, 2, 0.24)",
+      suggestionBg: "rgba(5, 18, 9, 0.98)",
+      suggestionHover: "rgba(34, 255, 136, 0.14)"
+    },
+    canes: {
+      bg: "#32120e",
+      panel: "rgba(86, 15, 20, 0.72)",
+      card: "rgba(255, 202, 76, 0.12)",
+      cardHover: "rgba(255, 202, 76, 0.20)",
+      grid: "rgba(255, 233, 175, 0.06)",
+      border: "rgba(255, 202, 76, 0.24)",
+      text: "#fff7e8",
+      muted: "rgba(255, 232, 193, 0.82)",
+      input: "rgba(255, 240, 214, 0.10)",
+      accent: "#ffd24d",
+      accentSoft: "rgba(255, 94, 70, 0.22)",
+      themeImage: "url('./assets/canes-theme.jpg')",
+      themeOverlay: "rgba(74, 5, 8, 0.42)",
+      suggestionBg: "rgba(108, 16, 22, 0.94)",
+      suggestionHover: "rgba(255, 210, 77, 0.16)"
     }
   };
 
@@ -75,6 +125,10 @@
     root.style.setProperty("--input", theme.input);
     root.style.setProperty("--accent", theme.accent);
     root.style.setProperty("--accent-soft", theme.accentSoft);
+    root.style.setProperty("--theme-image", theme.themeImage || "none");
+    root.style.setProperty("--theme-overlay", theme.themeOverlay || "rgba(0, 0, 0, 0)");
+    root.style.setProperty("--suggestion-bg", theme.suggestionBg || "rgba(24, 24, 24, 0.96)");
+    root.style.setProperty("--suggestion-hover", theme.suggestionHover || "rgba(255, 255, 255, 0.08)");
   }
 
   function setTheme(name) {

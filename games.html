@@ -123,7 +123,7 @@
             top: calc(100% + 10px);
             left: 0;
             right: 0;
-            background: rgba(24, 24, 24, 0.96);
+            background: var(--suggestion-bg, rgba(24, 24, 24, 0.96));
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 18px;
             backdrop-filter: blur(24px);
@@ -169,7 +169,7 @@
 
         .suggestion-button:hover,
         .suggestion-button.active {
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--suggestion-hover, rgba(255, 255, 255, 0.08));
         }
 
         .count {
