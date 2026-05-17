@@ -2,36 +2,29 @@
   const TITLE_KEY = "chickenCloakTitle";
   const ICON_KEY = "chickenCloakIcon";
 
-  const CLOAKS = [
-    {
-      id: "classlink",
-      label: "ClassLink",
-      title: "ClassLink LaunchPad",
-      icon: "https://myapps.classlink.com/favicon.ico",
-      url: "https://myapps.classlink.com/home"
-    },
-    {
-      id: "ixl",
-      label: "IXL",
-      title: "IXL | Dashboard",
-      icon: "https://www.ixl.com/favicon.ico",
-      url: "https://www.ixl.com/dashboard"
-    },
-    {
-      id: "schoology",
-      label: "Schoology",
-      title: "Home | Schoology",
-      icon: "https://cfisd.schoology.com/favicon.ico",
-      url: "https://cfisd.schoology.com/home"
-    },
-    {
-      id: "desmos",
-      label: "Desmos",
-      title: "Desmos | Graphing Calculator",
-      icon: "https://www.desmos.com/favicon.ico",
-      url: "https://www.desmos.com/calculator"
-    }
-  ];
+const CLOAKS = [
+  {
+    id: "desmos",
+    label: "Desmos",
+    title: "Desmos | Graphing Calculator",
+    icon: "./assets/cloak-desmos.png",
+    url: "https://www.desmos.com/calculator"
+  },
+  {
+    id: "schoology",
+    label: "Schoology",
+    title: "Home | Schoology",
+    icon: "./assets/cloak-schoology.png",
+    url: "https://cfisd.schoology.com/home"
+  },
+  {
+    id: "ixl",
+    label: "IXL",
+    title: "IXL | Dashboard",
+    icon: "./assets/cloak-ixl.png",
+    url: "https://www.ixl.com/dashboard"
+  }
+];
 
   function ensureFaviconLinks() {
     const selectors = [
