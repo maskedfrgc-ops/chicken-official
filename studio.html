@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>chicken • theme studio</title>
+<link rel="icon" type="image/png" href="./assets/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #181818;
+    --panel: rgba(32, 32, 32, 0.68);
+    --card: rgba(255,255,255,0.06);
+    --card-hover: rgba(255,255,255,0.08);
+    --grid: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --text: #fff;
+    --muted: rgba(255,255,255,0.64);
+    --input: rgba(255,255,255,0.07);
+    --accent: #fff;
+    --accent-soft: rgba(255,255,255,0.14);
+    --theme-image: none;
+    --theme-overlay: rgba(0,0,0,0);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow: hidden;
+    cursor: url('./assets/comic.cur'), auto;
+  }
+
+  a, button, input, label, select { cursor: url('./assets/comic.cur'), pointer; }
+
+  .background {
+    position: fixed;
+    inset: 0;
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: -2;
+  }
+
+  .background::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(var(--theme-overlay), var(--theme-overlay)),
+      var(--theme-image);
+    background-position: center;
+    background-size: cover;
+    filter: blur(12px);
+    transform: scale(1.05);
+    z-index: -1;
+  }
+
+  .sidebar {
+    position: fixed;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 82px;
+    background: var(--panel);
+    backdrop-filter: blur(24px);
+    border-radius: 20px;
+    padding: 24px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    z-index: 30;
+  }
+
+  .sidebar-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+
+  .sidebar-icon-asset {
+    width: 34px;
+    height: 34px;
+    display: block;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    transition: transform .35s cubic-bezier(.4,0,.2,1), filter .35s cubic-bezier(.4,0,.2,1);
+  }
+
+  .icon-home { background-image: url('./assets/home.png'); }
+  .icon-games { background-image: url('./assets/games.png'); width: 38px; }
+  .icon-apps { background-image: url('./assets/apps.png'); }
+  .icon-chat { background-image: url('./assets/chat.svg'); width: 46px; height: 46px; }
+  .icon-settings { background-image: url('./assets/settings.png'); }
+
+  .sidebar-icon:hover .sidebar-icon-asset { transform: scale(1.12); filter: brightness(0.72); }
+
+  .page {
+    min-height: 100vh;
+    padding: 28px 118px 28px 28px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 20px;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .header h1 {
+    font-size: 58px;
+    letter-spacing: -2px;
+    margin-bottom: 8px;
+  }
+
+  .header p { color: var(--muted); max-width: 720px; }
+
+  .header-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .ghost-btn, .primary-btn, .mini-card button, .chip, .upload-label {
+    border: 1px solid var(--border);
+    color: var(--text);
+    font: inherit;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.08);
+    padding: 12px 16px;
+  }
+
+  .primary-btn {
+    background: var(--accent-soft);
+  }
+
+  .workspace {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(360px, 1.1fr) minmax(420px, 1fr);
+    gap: 20px;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    backdrop-filter: blur(24px);
+    min-height: 0;
+  }
+
+  .preview-panel {
+    padding: 24px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 18px;
+  }
+
+  .preview-meta h2 {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .preview-meta p {
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .pedestal-wrap {
+    min-height: 0;
+    display: grid;
+    place-items: center;
+    position: relative;
+  }
+
+  .pedestal {
+    position: relative;
+    width: min(100%, 540px);
+    aspect-ratio: 1 / 1;
+    border-radius: 32px;
+    background:
+      radial-gradient(circle at 50% 20%, rgba(255,255,255,0.12), transparent 58%),
+      linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .pedestal::before {
+    content: '';
+    position: absolute;
+    inset: auto 12% 10% 12%;
+    height: 34px;
+    border-radius: 999px;
+    background: radial-gradient(circle at center, color-mix(in srgb, var(--accent-soft) 86%, transparent), transparent 72%);
+  }
+
+  .preview-stage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 26px;
+  }
+
+  .studio-card {
+    padding: 22px;
+    overflow: auto;
+    display: grid;
+    gap: 18px;
+    align-content: start;
+  }
+
+  .studio-card h2 {
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+
+  .mini-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 18px;
+    display: grid;
+    gap: 14px;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .field {
+    display: grid;
+    gap: 8px;
+  }
+
+  .field label {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .field input[type="color"],
+  .field input[type="range"],
+  .field input[type="file"] {
+    width: 100%;
+  }
+
+  .upload-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .upload-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .upload-label input { display: none; }
+
+  .upload-name {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .option-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
+    gap: 10px;
+  }
+
+  .chip {
+    text-align: center;
+    transition: transform .18s ease, background .18s ease, border-color .18s ease;
+  }
+
+  .chip.is-active, .chip:hover {
+    transform: translateY(-2px);
+    background: var(--accent-soft);
+    border-color: color-mix(in srgb, var(--accent) 56%, var(--border));
+  }
+
+  .status-line {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.88), rgba(8,8,8,0.94)),
+      var(--bg);
+    display: grid;
+    place-items: center;
+    transition: opacity .45s ease, visibility .45s ease;
+  }
+
+  .loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .loading-box {
+    width: min(440px, calc(100vw - 48px));
+    padding: 26px;
+    border-radius: 28px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    backdrop-filter: blur(24px);
+  }
+
+  .loading-box h2 { font-size: 36px; margin-bottom: 10px; }
+  .loading-box p { color: var(--muted); margin-bottom: 18px; }
+
+  .loading-bar {
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden;
+  }
+
+  .loading-bar span {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 64%, white));
+    animation: studio-load 1.15s ease forwards;
+  }
+
+  @keyframes studio-load {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  @media (max-width: 1080px) {
+    .workspace { grid-template-columns: 1fr; }
+    body { overflow: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="background"></div>
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-box">
+    <h2>theme studio</h2>
+    <p>loading your shop, colors, cursor, and chicken guide.</p>
+    <div class="loading-bar"><span></span></div>
+  </div>
+</div>
+
+<div class="sidebar">
+  <a class="sidebar-icon" href="./index.html" aria-label="Home"><div class="sidebar-icon-asset icon-home"></div></a>
+  <a class="sidebar-icon" href="./games.html" aria-label="Games"><div class="sidebar-icon-asset icon-games"></div></a>
+  <a class="sidebar-icon" href="./apps.html" aria-label="Apps"><div class="sidebar-icon-asset icon-apps"></div></a>
+  <a class="sidebar-icon" href="./chat.html" aria-label="Chat"><div class="sidebar-icon-asset icon-chat"></div></a>
+  <a class="sidebar-icon" href="./settings.html" aria-label="Settings"><div class="sidebar-icon-asset icon-settings"></div></a>
+</div>
+
+<main class="page">
+  <header class="header">
+    <div>
+      <h1>theme studio</h1>
+      <p>Build your own version of Chicken here. Recolor the site, upload a cursor image, dress your guide, and save everything in one place.</p>
+    </div>
+    <div class="header-actions">
+      <a class="ghost-btn" href="./settings.html">back to settings</a>
+      <button class="primary-btn" id="saveStudioButton" type="button">save studio</button>
+    </div>
+  </header>
+
+  <section class="workspace">
+    <section class="panel preview-panel">
+      <div class="preview-meta">
+        <h2>guide preview</h2>
+        <p>Spin the guide, hover clothing on the right to preview it, and save the exact look you want to use across the site.</p>
+      </div>
+      <div class="pedestal-wrap">
+        <div class="pedestal">
+          <div class="preview-stage" id="guidePreview"></div>
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="rotationRange">rotation</label>
+          <input id="rotationRange" type="range" min="-45" max="45" value="0">
+        </div>
+        <div class="field">
+          <label for="poseSelect">guide style</label>
+          <select id="poseSelect">
+            <option value="idle">idle</option>
+            <option value="point">point</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel studio-card">
+      <div class="mini-card">
+        <h2>site colors</h2>
+        <div class="field-grid">
+          <div class="field"><label for="accentColor">primary accent</label><input id="accentColor" type="color" value="#ffffff"></div>
+          <div class="field"><label for="accentSoftColor">secondary glow</label><input id="accentSoftColor" type="color" value="#7d7d7d"></div>
+          <div class="field"><label for="bgColor">background</label><input id="bgColor" type="color" value="#181818"></div>
+          <div class="field"><label for="panelColor">panel tint</label><input id="panelColor" type="color" value="#202020"></div>
+          <div class="field"><label for="textColor">main text</label><input id="textColor" type="color" value="#ffffff"></div>
+          <div class="field"><label for="mutedColor">muted text</label><input id="mutedColor" type="color" value="#b0b0b0"></div>
+        </div>
+      </div>
+
+      <div class="mini-card">
+        <h2>cursor image</h2>
+        <div class="upload-row">
+          <label class="upload-label">choose cursor image
+            <input id="cursorUpload" type="file" accept="image/*,.cur">
+          </label>
+          <button id="resetCursorButton" type="button">reset cursor</button>
+        </div>
+        <div class="upload-name" id="cursorFileName">using current saved cursor</div>
+      </div>
+
+      <div class="mini-card">
+        <h2>hats</h2>
+        <div class="option-grid" id="hatOptions"></div>
+      </div>
+
+      <div class="mini-card">
+        <h2>shirts</h2>
+        <div class="option-grid" id="shirtOptions"></div>
+      </div>
+
+      <div class="mini-card">
+        <h2>shoes</h2>
+        <div class="option-grid" id="shoeOptions"></div>
+      </div>
+
+      <div class="mini-card">
+        <h2>guide use</h2>
+        <p class="status-line">Your saved guide style can be sent in chat like a sticker, and the studio remembers your outfit even after you close the tab.</p>
+        <div>
+          <button id="resetGuideButton" type="button">reset guide look</button>
+          <button id="resetColorsButton" type="button">reset colors</button>
+        </div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<script src="./js/theme.js"></script>
+<script src="./js/cloak.js"></script>
+<script src="./js/guide-style.js"></script>
+<script>
+  const loadingScreen = document.getElementById('loadingScreen');
+  const previewEl = document.getElementById('guidePreview');
+  const saveStudioButton = document.getElementById('saveStudioButton');
+  const resetColorsButton = document.getElementById('resetColorsButton');
+  const resetGuideButton = document.getElementById('resetGuideButton');
+  const resetCursorButton = document.getElementById('resetCursorButton');
+  const cursorUpload = document.getElementById('cursorUpload');
+  const cursorFileName = document.getElementById('cursorFileName');
+  const rotationRange = document.getElementById('rotationRange');
+  const poseSelect = document.getElementById('poseSelect');
+  const hatOptions = document.getElementById('hatOptions');
+  const shirtOptions = document.getElementById('shirtOptions');
+  const shoeOptions = document.getElementById('shoeOptions');
+
+  const colorInputs = {
+    accent: document.getElementById('accentColor'),
+    accentSoft: document.getElementById('accentSoftColor'),
+    bg: document.getElementById('bgColor'),
+    panel: document.getElementById('panelColor'),
+    text: document.getElementById('textColor'),
+    muted: document.getElementById('mutedColor')
+  };
+
+  const state = {
+    guide: window.CHICKEN_GUIDE.getConfig(),
+    overrides: window.getChickenThemeOverrides ? window.getChickenThemeOverrides() : {}
+  };
+
+  function rgbaFromHex(hex, alpha) {
+    const value = hex.replace('#', '');
+    const normalized = value.length === 3
+      ? value.split('').map((char) => char + char).join('')
+      : value.padEnd(6, '0').slice(0, 6);
+    const r = parseInt(normalized.slice(0, 2), 16);
+    const g = parseInt(normalized.slice(2, 4), 16);
+    const b = parseInt(normalized.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  function syncColorInputs() {
+    const root = getComputedStyle(document.documentElement);
+    colorInputs.accent.value = rgbToHex(root.getPropertyValue('--accent')) || '#ffffff';
+    colorInputs.bg.value = rgbToHex(root.getPropertyValue('--bg')) || '#181818';
+    colorInputs.text.value = rgbToHex(root.getPropertyValue('--text')) || '#ffffff';
+    colorInputs.panel.value = rgbToHex(root.getPropertyValue('--panel')) || '#202020';
+    colorInputs.muted.value = rgbToHex(root.getPropertyValue('--muted')) || '#b0b0b0';
+    colorInputs.accentSoft.value = rgbToHex(root.getPropertyValue('--accent-soft')) || '#7d7d7d';
+  }
+
+  function rgbToHex(value) {
+    const match = value.match(/\d+/g);
+    if (!match || match.length < 3) return null;
+    return `#${match.slice(0, 3).map((part) => Number(part).toString(16).padStart(2, '0')).join('')}`;
+  }
+
+  function renderPreview(previewConfig = state.guide) {
+    window.CHICKEN_GUIDE.render(previewEl, previewConfig);
+  }
+
+  function setGuide(next) {
+    state.guide = { ...state.guide, ...next };
+    renderPreview();
+  }
+
+  function makeChips(container, type, options) {
+    container.innerHTML = '';
+    options.forEach((option) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'chip';
+      button.textContent = option.label;
+      const refresh = () => {
+        button.classList.toggle('is-active', state.guide[type] === option.id);
+      };
+      refresh();
+      button.addEventListener('mouseenter', () => {
+        renderPreview({ ...state.guide, [type]: option.id });
+      });
+      button.addEventListener('mouseleave', () => {
+        renderPreview();
+      });
+      button.addEventListener('click', () => {
+        setGuide({ [type]: option.id });
+        makeOptionSets();
+      });
+      container.appendChild(button);
+    });
+  }
+
+  function makeOptionSets() {
+    makeChips(hatOptions, 'hat', window.CHICKEN_GUIDE.options.hats);
+    makeChips(shirtOptions, 'shirt', window.CHICKEN_GUIDE.options.shirts);
+    makeChips(shoeOptions, 'shoes', window.CHICKEN_GUIDE.options.shoes);
+  }
+
+  function applyStudioColors() {
+    const overrides = {
+      accent: colorInputs.accent.value,
+      accentSoft: rgbaFromHex(colorInputs.accentSoft.value, 0.22),
+      bg: colorInputs.bg.value,
+      panel: rgbaFromHex(colorInputs.panel.value, 0.72),
+      text: colorInputs.text.value,
+      muted: rgbaFromHex(colorInputs.muted.value, 0.74),
+      border: rgbaFromHex(colorInputs.accent.value, 0.18),
+      card: rgbaFromHex(colorInputs.accent.value, 0.10),
+      cardHover: rgbaFromHex(colorInputs.accent.value, 0.16),
+      grid: rgbaFromHex(colorInputs.accent.value, 0.06),
+      input: rgbaFromHex(colorInputs.accent.value, 0.10),
+      suggestionBg: rgbaFromHex(colorInputs.bg.value, 0.96),
+      suggestionHover: rgbaFromHex(colorInputs.accent.value, 0.14)
+    };
+    state.overrides = overrides;
+    if (window.setChickenThemeOverrides) window.setChickenThemeOverrides(overrides);
+  }
+
+  function saveAll() {
+    applyStudioColors();
+    window.CHICKEN_GUIDE.saveConfig(state.guide);
+    saveStudioButton.textContent = 'saved';
+    window.setTimeout(() => {
+      saveStudioButton.textContent = 'save studio';
+    }, 1100);
+  }
+
+  poseSelect.addEventListener('change', () => setGuide({ pose: poseSelect.value }));
+  rotationRange.addEventListener('input', () => setGuide({ rotation: Number(rotationRange.value) }));
+  Object.values(colorInputs).forEach((input) => input.addEventListener('input', applyStudioColors));
+  saveStudioButton.addEventListener('click', saveAll);
+
+  resetColorsButton.addEventListener('click', () => {
+    if (window.resetChickenThemeOverrides) window.resetChickenThemeOverrides();
+    syncColorInputs();
+  });
+
+  resetGuideButton.addEventListener('click', () => {
+    state.guide = { ...window.CHICKEN_GUIDE.defaultConfig };
+    poseSelect.value = state.guide.pose;
+    rotationRange.value = state.guide.rotation;
+    makeOptionSets();
+    renderPreview();
+  });
+
+  resetCursorButton.addEventListener('click', () => {
+    if (window.setChickenCursorValue) window.setChickenCursorValue('');
+    cursorFileName.textContent = 'using default chicken cursor';
+  });
+
+  cursorUpload.addEventListener('change', () => {
+    const file = cursorUpload.files && cursorUpload.files[0];
+    if (!file) return;
+    cursorFileName.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (window.setChickenCursorValue) window.setChickenCursorValue(String(reader.result || ''));
+    };
+    reader.readAsDataURL(file);
+  });
+
+  syncColorInputs();
+  poseSelect.value = state.guide.pose;
+  rotationRange.value = state.guide.rotation;
+  makeOptionSets();
+  renderPreview();
+
+  window.setTimeout(() => {
+    loadingScreen.classList.add('hidden');
+  }, 950);
+</script>
+</body>
+</html>

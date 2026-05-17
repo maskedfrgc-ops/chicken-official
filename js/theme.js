@@ -1,5 +1,9 @@
 (() => {
   const THEME_KEY = "chickenTheme";
+  const OVERRIDES_KEY = "chickenThemeOverrides";
+  const CURSOR_KEY = "chickenCursorData";
+  const DEFAULT_CURSOR = "./assets/comic.cur";
+
   const THEMES = {
     chicken: {
       bg: "#181818",
@@ -105,13 +109,48 @@
     }
   };
 
+  function ensureCursorStyle() {
+    if (document.getElementById("chicken-theme-cursor-style")) return;
+    const style = document.createElement("style");
+    style.id = "chicken-theme-cursor-style";
+    style.textContent = `
+      body { cursor: var(--cursor-url), auto !important; }
+      a, button, input, textarea, select, label, summary { cursor: var(--cursor-url), pointer !important; }
+    `;
+    document.head.appendChild(style);
+  }
+
   function getThemeName() {
     const saved = localStorage.getItem(THEME_KEY);
     return THEMES[saved] ? saved : "chicken";
   }
 
+  function getThemeOverrides() {
+    try {
+      return JSON.parse(localStorage.getItem(OVERRIDES_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  }
+
+  function getCursorValue() {
+    return localStorage.getItem(CURSOR_KEY) || DEFAULT_CURSOR;
+  }
+
+  function buildTheme(name = getThemeName()) {
+    const theme = { ...(THEMES[name] || THEMES.chicken) };
+    const overrides = getThemeOverrides();
+    for (const [key, value] of Object.entries(overrides)) {
+      if (typeof value === "string" && value.trim()) {
+        theme[key] = value.trim();
+      }
+    }
+    return theme;
+  }
+
   function applyTheme(name = getThemeName()) {
-    const theme = THEMES[name] || THEMES.chicken;
+    ensureCursorStyle();
+    const theme = buildTheme(name);
     const root = document.documentElement;
     root.dataset.theme = name;
     root.style.setProperty("--bg", theme.bg);
@@ -129,6 +168,8 @@
     root.style.setProperty("--theme-overlay", theme.themeOverlay || "rgba(0, 0, 0, 0)");
     root.style.setProperty("--suggestion-bg", theme.suggestionBg || "rgba(24, 24, 24, 0.96)");
     root.style.setProperty("--suggestion-hover", theme.suggestionHover || "rgba(255, 255, 255, 0.08)");
+    root.style.setProperty("--cursor-url", `url('${getCursorValue()}')`);
+    window.dispatchEvent(new CustomEvent("chicken:theme-change", { detail: { name, theme } }));
   }
 
   function setTheme(name) {
@@ -137,9 +178,33 @@
     applyTheme(next);
   }
 
+  function setThemeOverrides(nextOverrides = {}) {
+    localStorage.setItem(OVERRIDES_KEY, JSON.stringify(nextOverrides));
+    applyTheme(getThemeName());
+  }
+
+  function resetThemeOverrides() {
+    localStorage.removeItem(OVERRIDES_KEY);
+    applyTheme(getThemeName());
+  }
+
+  function setCursorData(value) {
+    if (value) {
+      localStorage.setItem(CURSOR_KEY, value);
+    } else {
+      localStorage.removeItem(CURSOR_KEY);
+    }
+    applyTheme(getThemeName());
+  }
+
   window.CHICKEN_THEMES = THEMES;
   window.applyChickenTheme = applyTheme;
   window.setChickenTheme = setTheme;
   window.getChickenTheme = getThemeName;
+  window.getChickenThemeOverrides = getThemeOverrides;
+  window.setChickenThemeOverrides = setThemeOverrides;
+  window.resetChickenThemeOverrides = resetThemeOverrides;
+  window.getChickenCursorValue = getCursorValue;
+  window.setChickenCursorValue = setCursorData;
   applyTheme();
 })();
