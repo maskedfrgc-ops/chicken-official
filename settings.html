@@ -151,6 +151,30 @@
     font: inherit;
     outline: none;
     margin-bottom: 12px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+
+  .select-wrap {
+    position: relative;
+    margin-bottom: 12px;
+  }
+
+  .select-wrap select {
+    margin-bottom: 0;
+    padding-right: 48px;
+  }
+
+  .select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+    font-size: 14px;
   }
 
   button {
@@ -216,9 +240,11 @@
       <section id="cloaksettings" class="settings-section">
         <h2>tab cloak</h2>
         <p>disguise the tab title and icon</p>
-        <select id="cloakSelect">
-          <option value="">none (default)</option>
-        </select>
+        <div class="select-wrap">
+          <select id="cloakSelect">
+            <option value="">none (default)</option>
+          </select>
+        </div>
         <button id="cloakReset">reset cloak</button>
       </section>
 
@@ -234,24 +260,28 @@
       <section id="proxysettings" class="settings-section">
         <h2>proxy</h2>
         <p>choose which proxy the home search uses</p>
-        <select id="proxySelect">
-          <option value="uv">uv static (default)</option>
-          <option value="scramjet">scramjet (fallback)</option>
-        </select>
+        <div class="select-wrap">
+          <select id="proxySelect">
+            <option value="uv">uv static (default)</option>
+            <option value="scramjet">scramjet (fallback)</option>
+          </select>
+        </div>
         <p id="proxyStatus"></p>
       </section>
 
       <section id="themesettings" class="settings-section">
         <h2>color theme</h2>
         <p>change the colors for the whole site</p>
-        <select id="themeSelect">
-          <option value="chicken">chicken</option>
-          <option value="blueprint">blueprint blue</option>
-          <option value="ember">ember orange</option>
-          <option value="forest">forest green</option>
-          <option value="hacker">hacker</option>
-          <option value="canes">canes</option>
-        </select>
+        <div class="select-wrap">
+          <select id="themeSelect">
+            <option value="chicken">chicken</option>
+            <option value="blueprint">blueprint blue</option>
+            <option value="ember">ember orange</option>
+            <option value="forest">forest green</option>
+            <option value="hacker">hacker</option>
+            <option value="canes">canes</option>
+          </select>
+        </div>
         <p id="themeStatus"></p>
       </section>
 
