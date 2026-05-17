@@ -116,7 +116,6 @@
   let textEl;
   let progressEl;
   let mascotEl;
-  let pointerEl;
   let nextButton;
   let skipButton;
   let swapButton;
@@ -249,41 +248,6 @@
         border-radius: 22px !important;
       }
 
-      .chicken-tour-pointer {
-        position: fixed;
-        width: 42px;
-        height: 42px;
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-      }
-
-      .chicken-tour-pointer::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.16);
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        animation: chicken-tour-pulse 1.6s ease-in-out infinite;
-      }
-
-      .chicken-tour-pointer::after {
-        content: '';
-        position: absolute;
-        left: 8px;
-        top: 5px;
-        width: 18px;
-        height: 24px;
-        background: rgba(255, 255, 255, 0.72);
-        clip-path: polygon(0 0, 100% 55%, 58% 62%, 76% 100%, 56% 100%, 42% 66%, 0 100%);
-        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
-      }
-
-      @keyframes chicken-tour-pulse {
-        0%, 100% { transform: scale(0.92); opacity: 0.55; }
-        50% { transform: scale(1.08); opacity: 1; }
-      }
-
       @media (max-width: 760px) {
         .chicken-tour-panel {
           grid-template-columns: 88px minmax(0, 1fr);
@@ -319,7 +283,6 @@
     tourRoot.hidden = true;
     tourRoot.innerHTML = `
       <div class="chicken-tour-scrim"></div>
-      <div class="chicken-tour-pointer" aria-hidden="true"></div>
       <div class="chicken-tour-panel">
         <div class="chicken-tour-mascot-box">
           <img alt="Chicken mascot" />
@@ -343,7 +306,6 @@
 
     scrim = tourRoot.querySelector(".chicken-tour-scrim");
     panel = tourRoot.querySelector(".chicken-tour-panel");
-    pointerEl = tourRoot.querySelector(".chicken-tour-pointer");
     mascotEl = tourRoot.querySelector("img");
     titleEl = tourRoot.querySelector(".chicken-tour-title");
     textEl = tourRoot.querySelector(".chicken-tour-text");
@@ -418,33 +380,7 @@
   }
 
   function refreshPosition() {
-    const step = STEPS[getStepIndex()];
-    if (!step || !step.selector) {
-      pointerEl.style.display = "none";
-      return;
-    }
-
-    const target = document.querySelector(step.selector);
-    if (!target) {
-      pointerEl.style.display = "none";
-      return;
-    }
-
-    const rect = target.getBoundingClientRect();
-    let x = rect.left + rect.width / 2;
-    let y = rect.top + rect.height / 2;
-
-    if (/tab|settings/.test(step.selector)) {
-      x = rect.left - 26;
-    } else if (step.selector.includes("status")) {
-      y = rect.bottom + 22;
-    } else {
-      y = rect.top - 20;
-    }
-
-    pointerEl.style.display = "block";
-    pointerEl.style.left = `${x}px`;
-    pointerEl.style.top = `${y}px`;
+    return;
   }
 
   function bindTargetAdvance(step, target) {
