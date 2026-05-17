@@ -416,23 +416,23 @@
     
     <!-- Floating Right Sidebar with SVG Icons -->
     <div class="sidebar">
-        <a class="sidebar-icon active" href="./index.html" aria-label="Home">
+        <a class="sidebar-icon active" href="./index.html" aria-label="Home" data-tour-target="home-tab">
             <div class="sidebar-icon-asset icon-home"></div>
         </a>
 
-        <a class="sidebar-icon" href="./games.html" aria-label="Games">
+        <a class="sidebar-icon" href="./games.html" aria-label="Games" data-tour-target="games-tab">
             <div class="sidebar-icon-asset icon-games"></div>
         </a>
         
-        <a class="sidebar-icon" href="./apps.html" aria-label="Apps">
+        <a class="sidebar-icon" href="./apps.html" aria-label="Apps" data-tour-target="apps-tab">
             <div class="sidebar-icon-asset icon-apps"></div>
         </a>
         
-        <a class="sidebar-icon" href="./chat.html" aria-label="Chat">
+        <a class="sidebar-icon" href="./chat.html" aria-label="Chat" data-tour-target="chat-tab">
             <div class="sidebar-icon-asset icon-chat"></div>
         </a>
         
-        <a class="sidebar-icon" href="./settings.html" aria-label="Settings">
+        <a class="sidebar-icon" href="./settings.html" aria-label="Settings" data-tour-target="settings-tab">
             <div class="sidebar-icon-asset icon-settings"></div>
         </a>
     </div>
@@ -445,7 +445,7 @@
             <div class="rotating-text" id="rotatingText"></div>
         </div>
 
-        <form class="search-launcher" id="browserLaunchForm">
+        <form class="search-launcher" id="browserLaunchForm" data-tour-target="home-search">
             <input id="browserLaunchInput" type="text" placeholder="Search the web or enter a URL">
             <button type="submit">open</button>
         </form>
@@ -534,5 +534,6 @@
         });
     </script>
     <script src="./js/theme.js"></script>
+    <script src="./js/tutorial.js"></script>
 </body>
 </html>

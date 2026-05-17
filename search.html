@@ -207,11 +207,11 @@
 </head>
 <body>
     <div class="sidebar">
-        <a class="sidebar-icon" href="./index.html" aria-label="Home"><div class="sidebar-icon-asset icon-home"></div></a>
-        <a class="sidebar-icon" href="./games.html" aria-label="Games"><div class="sidebar-icon-asset icon-games"></div></a>
-        <a class="sidebar-icon" href="./apps.html" aria-label="Apps"><div class="sidebar-icon-asset icon-apps"></div></a>
-        <a class="sidebar-icon" href="./chat.html" aria-label="Chat"><div class="sidebar-icon-asset icon-chat"></div></a>
-        <a class="sidebar-icon" href="./settings.html" aria-label="Settings"><div class="sidebar-icon-asset icon-settings"></div></a>
+        <a class="sidebar-icon" href="./index.html" aria-label="Home" data-tour-target="home-tab"><div class="sidebar-icon-asset icon-home"></div></a>
+        <a class="sidebar-icon" href="./games.html" aria-label="Games" data-tour-target="games-tab"><div class="sidebar-icon-asset icon-games"></div></a>
+        <a class="sidebar-icon" href="./apps.html" aria-label="Apps" data-tour-target="apps-tab"><div class="sidebar-icon-asset icon-apps"></div></a>
+        <a class="sidebar-icon" href="./chat.html" aria-label="Chat" data-tour-target="chat-tab"><div class="sidebar-icon-asset icon-chat"></div></a>
+        <a class="sidebar-icon" href="./settings.html" aria-label="Settings" data-tour-target="settings-tab"><div class="sidebar-icon-asset icon-settings"></div></a>
     </div>
 
     <main class="browser-shell">
@@ -221,11 +221,11 @@
             <button class="browser-btn" id="reloadButton" type="button" title="Reload">&#8635;</button>
             <button class="browser-btn" id="homeButton" type="button" title="Home">&#8962;</button>
             <form class="address-form" id="addressForm">
-                <input class="address-input" id="addressInput" type="text" placeholder="Search anything or enter a URL" autocomplete="off">
+                <input class="address-input" id="addressInput" type="text" placeholder="Search anything or enter a URL" autocomplete="off" data-tour-target="browser-search">
             </form>
             <button class="browser-btn" id="openTabButton" type="button" title="Open in tab">&#8599;</button>
         </div>
-        <div class="status-line" id="statusLine">chicken browser</div>
+        <div class="status-line" id="statusLine" data-tour-target="browser-status">chicken browser</div>
         <div class="browser-frame-wrap">
             <iframe class="browser-frame" id="browserFrame" referrerpolicy="no-referrer"></iframe>
             <div class="browser-empty" id="emptyState">Search the web or open a URL through UV.</div>
@@ -385,5 +385,6 @@
             navigate(initial);
         }
     </script>
+    <script src="./js/tutorial.js"></script>
 </body>
 </html>

@@ -276,11 +276,11 @@
 </head>
 <body>
   <div class="sidebar">
-    <a class="sidebar-icon" href="./index.html" aria-label="Home"><div class="sidebar-icon-asset icon-home"></div></a>
-    <a class="sidebar-icon" href="./games.html" aria-label="Games"><div class="sidebar-icon-asset icon-games"></div></a>
-    <a class="sidebar-icon" href="./apps.html" aria-label="Apps"><div class="sidebar-icon-asset icon-apps"></div></a>
-    <a class="sidebar-icon" href="./chat.html" aria-label="Chat"><div class="sidebar-icon-asset icon-chat"></div></a>
-    <a class="sidebar-icon" href="./settings.html" aria-label="Settings"><div class="sidebar-icon-asset icon-settings"></div></a>
+    <a class="sidebar-icon" href="./index.html" aria-label="Home" data-tour-target="home-tab"><div class="sidebar-icon-asset icon-home"></div></a>
+    <a class="sidebar-icon" href="./games.html" aria-label="Games" data-tour-target="games-tab"><div class="sidebar-icon-asset icon-games"></div></a>
+    <a class="sidebar-icon" href="./apps.html" aria-label="Apps" data-tour-target="apps-tab"><div class="sidebar-icon-asset icon-apps"></div></a>
+    <a class="sidebar-icon" href="./chat.html" aria-label="Chat" data-tour-target="chat-tab"><div class="sidebar-icon-asset icon-chat"></div></a>
+    <a class="sidebar-icon" href="./settings.html" aria-label="Settings" data-tour-target="settings-tab"><div class="sidebar-icon-asset icon-settings"></div></a>
   </div>
 
   <main class="page">
@@ -288,7 +288,7 @@
     <p class="intro">site preferences and utility tools for chicken</p>
 
     <div class="settings-grid">
-      <section id="cloaksettings" class="settings-section">
+      <section id="cloaksettings" class="settings-section" data-tour-target="cloak-settings">
         <h2>tab cloak</h2>
         <p>disguise the tab title and icon</p>
         <div class="select-wrap">
@@ -308,7 +308,7 @@
         <p id="adsStatus"></p>
       </section>
 
-      <section id="proxysettings" class="settings-section">
+      <section id="proxysettings" class="settings-section" data-tour-target="proxy-settings">
         <h2>proxy</h2>
         <p>choose which proxy the home search uses</p>
         <div class="select-wrap">
@@ -320,7 +320,7 @@
         <p id="proxyStatus"></p>
       </section>
 
-      <section id="themesettings" class="settings-section">
+      <section id="themesettings" class="settings-section" data-tour-target="theme-settings">
         <h2>color theme</h2>
         <p>change the colors for the whole site</p>
         <div class="select-wrap">
@@ -369,6 +369,12 @@
         <button onclick="exportData('save')">export your data</button>
         <button onclick="importData()">import data</button>
         <button onclick="clearAllData()">clear all data</button>
+      </section>
+
+      <section id="tutorialsettings" class="settings-section" data-tour-target="tutorial-settings">
+        <h2>site tutorial</h2>
+        <p>replay the mascot walkthrough whenever you want.</p>
+        <button id="restartTutorial" type="button">start tutorial</button>
       </section>
 
     </div>
@@ -592,10 +598,14 @@ function importData(){
   };
   input.click();
 }
+document.getElementById("restartTutorial")?.addEventListener("click",()=>{
+  if(window.ChickenTour) window.ChickenTour.start(true);
+});
 </script>
 <script src="./js/mobile.js"></script>
 <script src="./js/panic.js"></script>
 <script src="./js/cloak.js"></script>
 <script src="./js/theme.js"></script>
+<script src="./js/tutorial.js"></script>
 </body>
 </html>

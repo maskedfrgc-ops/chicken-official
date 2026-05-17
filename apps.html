@@ -44,16 +44,16 @@
 <body>
     <div class="background"></div>
     <div class="sidebar">
-        <a class="sidebar-icon" href="./index.html" aria-label="Home"><div class="sidebar-icon-asset icon-home"></div></a>
-        <a class="sidebar-icon" href="./games.html" aria-label="Games"><div class="sidebar-icon-asset icon-games"></div></a>
-        <a class="sidebar-icon" href="./apps.html" aria-label="Apps"><div class="sidebar-icon-asset icon-apps"></div></a>
-        <a class="sidebar-icon" href="./chat.html" aria-label="Chat"><div class="sidebar-icon-asset icon-chat"></div></a>
-        <a class="sidebar-icon" href="./settings.html" aria-label="Settings"><div class="sidebar-icon-asset icon-settings"></div></a>
+        <a class="sidebar-icon" href="./index.html" aria-label="Home" data-tour-target="home-tab"><div class="sidebar-icon-asset icon-home"></div></a>
+        <a class="sidebar-icon" href="./games.html" aria-label="Games" data-tour-target="games-tab"><div class="sidebar-icon-asset icon-games"></div></a>
+        <a class="sidebar-icon" href="./apps.html" aria-label="Apps" data-tour-target="apps-tab"><div class="sidebar-icon-asset icon-apps"></div></a>
+        <a class="sidebar-icon" href="./chat.html" aria-label="Chat" data-tour-target="chat-tab"><div class="sidebar-icon-asset icon-chat"></div></a>
+        <a class="sidebar-icon" href="./settings.html" aria-label="Settings" data-tour-target="settings-tab"><div class="sidebar-icon-asset icon-settings"></div></a>
     </div>
     <main class="page">
         <h1>apps</h1>
         <div class="search-wrap">
-            <div class="search"><input id="searchInput" type="text" placeholder="Search apps..."></div>
+            <div class="search" data-tour-target="apps-search"><input id="searchInput" type="text" placeholder="Search apps..."></div>
             <div class="search-suggestions" id="searchSuggestions"></div>
         </div>
         <div class="count" id="countLabel">Loading apps...</div>
@@ -186,5 +186,6 @@
         render(items);
     </script>
     <script src="./js/theme.js"></script>
+    <script src="./js/tutorial.js"></script>
 </body>
 </html>
