@@ -325,6 +325,7 @@
     </main>
 
     <script src="./data/gakaas-games.js"></script>
+    <script src="./data/zip-imported-games.js"></script>
     <script>
         const GN_SOURCE = {
             zones: [
@@ -515,7 +516,8 @@
                 }
 
                 const extraSources = [
-                    Array.isArray(window.CHICKEN_EXTRA_GAMES) ? window.CHICKEN_EXTRA_GAMES : []
+                    Array.isArray(window.CHICKEN_EXTRA_GAMES) ? window.CHICKEN_EXTRA_GAMES : [],
+                    Array.isArray(window.CHICKEN_ZIP_IMPORTED_GAMES) ? window.CHICKEN_ZIP_IMPORTED_GAMES : []
                 ];
 
                 for (const source of extraSources) {
