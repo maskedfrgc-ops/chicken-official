@@ -2,8 +2,7 @@
   const STORAGE = {
     active: "chickenTourActive",
     step: "chickenTourStep",
-    done: "chickenTourDone",
-    mascot: "chickenTourMascot"
+    done: "chickenTourDone"
   };
 
   const MASCOTS = [
@@ -118,10 +117,10 @@
   let mascotEl;
   let nextButton;
   let skipButton;
-  let swapButton;
   let typingTimer = null;
   let highlighted = null;
   let typedDone = true;
+  let sidebarHighlight = null;
 
   function ensureStyles() {
     if (document.getElementById("chicken-tour-styles")) return;
@@ -164,21 +163,33 @@
       }
 
       .chicken-tour-mascot-box {
+        position: relative;
         width: 110px;
         height: 110px;
         border-radius: 22px;
         background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid color-mix(in srgb, var(--accent, #ffffff) 45%, rgba(255, 255, 255, 0.08));
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 18px 36px color-mix(in srgb, var(--accent-soft, rgba(255,255,255,0.14)) 70%, transparent);
+      }
+
+      .chicken-tour-mascot-box::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(145deg, color-mix(in srgb, var(--accent-soft, rgba(255,255,255,0.14)) 95%, transparent), transparent 60%);
+        mix-blend-mode: screen;
+        pointer-events: none;
       }
 
       .chicken-tour-mascot-box img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        filter: saturate(0.92) sepia(0.08);
       }
 
       .chicken-tour-copy {
@@ -244,8 +255,14 @@
       .chicken-tour-target {
         position: relative !important;
         z-index: 10000 !important;
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.82), 0 0 0 14px rgba(255, 255, 255, 0.08) !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #ffffff) 85%, white), 0 0 0 14px color-mix(in srgb, var(--accent-soft, rgba(255,255,255,0.14)) 88%, transparent) !important;
         border-radius: 22px !important;
+      }
+
+      .chicken-tour-target-sidebar {
+        position: relative !important;
+        z-index: 10000 !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #ffffff) 85%, white), 0 0 0 14px color-mix(in srgb, var(--accent-soft, rgba(255,255,255,0.14)) 88%, transparent) !important;
       }
 
       @media (max-width: 760px) {
@@ -294,7 +311,6 @@
           <div class="chicken-tour-footer">
             <div class="chicken-tour-progress"></div>
             <div class="chicken-tour-actions">
-              <button class="chicken-tour-btn" type="button" data-tour-action="swap">swap mascot</button>
               <button class="chicken-tour-btn" type="button" data-tour-action="skip">skip</button>
               <button class="chicken-tour-btn primary" type="button" data-tour-action="next">next</button>
             </div>
@@ -310,11 +326,9 @@
     titleEl = tourRoot.querySelector(".chicken-tour-title");
     textEl = tourRoot.querySelector(".chicken-tour-text");
     progressEl = tourRoot.querySelector(".chicken-tour-progress");
-    swapButton = tourRoot.querySelector('[data-tour-action="swap"]');
     skipButton = tourRoot.querySelector('[data-tour-action="skip"]');
     nextButton = tourRoot.querySelector('[data-tour-action="next"]');
 
-    swapButton.addEventListener("click", cycleMascot);
     skipButton.addEventListener("click", () => stop(true));
     nextButton.addEventListener("click", handleNext);
     window.addEventListener("resize", refreshPosition);
@@ -330,25 +344,22 @@
     localStorage.setItem(STORAGE.step, String(index));
   }
 
-  function getMascotIndex() {
-    const raw = Number(localStorage.getItem(STORAGE.mascot) || 0);
-    return Number.isFinite(raw) ? ((raw % MASCOTS.length) + MASCOTS.length) % MASCOTS.length : 0;
-  }
-
-  function setMascot() {
-    mascotEl.src = MASCOTS[getMascotIndex()];
-  }
-
-  function cycleMascot() {
-    const next = (getMascotIndex() + 1) % MASCOTS.length;
-    localStorage.setItem(STORAGE.mascot, String(next));
-    setMascot();
+  function getMascotForStep(step) {
+    if (!step) return MASCOTS[0];
+    if (/tab|settings|status/.test(step.selector || "")) {
+      return MASCOTS[1];
+    }
+    return MASCOTS[0];
   }
 
   function clearHighlight() {
     if (highlighted) {
       highlighted.classList.remove("chicken-tour-target");
       highlighted = null;
+    }
+    if (sidebarHighlight) {
+      sidebarHighlight.classList.remove("chicken-tour-target-sidebar");
+      sidebarHighlight = null;
     }
   }
 
@@ -408,7 +419,7 @@
 
     buildUI();
     tourRoot.hidden = false;
-    setMascot();
+    mascotEl.src = getMascotForStep(step);
     clearHighlight();
 
     titleEl.textContent = step.title;
@@ -420,8 +431,15 @@
       const target = document.querySelector(step.selector);
       if (target) {
         target.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
-        target.classList.add("chicken-tour-target");
-        highlighted = target;
+        if ((step.selector || "").includes("-tab")) {
+          sidebarHighlight = document.querySelector(".sidebar");
+          if (sidebarHighlight) {
+            sidebarHighlight.classList.add("chicken-tour-target-sidebar");
+          }
+        } else {
+          target.classList.add("chicken-tour-target");
+          highlighted = target;
+        }
         bindTargetAdvance(step, target);
       }
     }
