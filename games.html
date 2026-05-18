@@ -276,21 +276,10 @@
         <div class="grid" id="cardGrid"></div>
     </main>
 
-    <script src="./data/gakaas-games.js"></script>
-    <script src="./data/zip-imported-games.js"></script>
+    <script src="./data/all-games.js?v=20260517a"></script>
     <script src="./js/cloak.js"></script>
     <script>
-        const GN_SOURCE = {
-            zones: [
-                'https://cdn.jsdelivr.net/gh/gnmathcopy/assets@latest/zones.json',
-                'https://cdn.jsdelivr.net/gh/gnmathcopy/assets@master/zones.json',
-                'https://cdn.jsdelivr.net/gh/gnmathcopy/assets/zones.json'
-            ],
-            covers: 'https://cdn.jsdelivr.net/gh/gnmathcopy/covers@main',
-            html: 'https://cdn.jsdelivr.net/gh/gnmathcopy/html@main'
-        };
-
-        let items = [];
+        let items = Array.isArray(window.CHICKEN_ALL_GAMES) ? window.CHICKEN_ALL_GAMES : [];
         const grid = document.getElementById('cardGrid');
         const searchInput = document.getElementById('searchInput');
         const countLabel = document.getElementById('countLabel');
@@ -305,12 +294,6 @@
         function getHref(item) {
             const frame = item.frameType === 'unity' ? './unityframe.html' : './iframe.html';
             return `${frame}?url=${encodeURIComponent(item.url || '')}`;
-        }
-
-        function resolveGnValue(value) {
-            return String(value || '')
-                .replace('{COVER_URL}', GN_SOURCE.covers)
-                .replace('{HTML_URL}', GN_SOURCE.html);
         }
 
         function normalizeName(value) {
@@ -422,64 +405,18 @@
             showSuggestions(matches);
         }
 
-        async function fetchGnGames() {
-            const merged = [];
-            const seen = new Set();
-
-            for (const url of GN_SOURCE.zones) {
-                try {
-                    const response = await fetch(url, { cache: 'no-store' });
-                    const data = await response.json();
-
-                    data
-                        .filter((item) => item && item.name && item.url)
-                        .forEach((item) => {
-                            const key = normalizeName(item.name);
-                            if (seen.has(key)) return;
-                            seen.add(key);
-                            merged.push({
-                                name: item.name,
-                                url: resolveGnValue(item.url),
-                                thumbnail: resolveGnValue(item.cover),
-                                frameType: 'iframe'
-                            });
-                        });
-                } catch (error) {
-                }
-            }
-
-            return merged;
-        }
-
-        async function loadGames() {
+        function loadGames() {
             countLabel.textContent = 'Loading games...';
 
             try {
-                const remoteItems = await fetchGnGames();
-
                 const merged = [];
                 const seen = new Set();
 
-                for (const item of remoteItems) {
+                for (const item of items) {
                     const key = normalizeName(item.name);
                     if (!seen.has(key)) {
                         seen.add(key);
                         merged.push(item);
-                    }
-                }
-
-                const extraSources = [
-                    Array.isArray(window.CHICKEN_EXTRA_GAMES) ? window.CHICKEN_EXTRA_GAMES : [],
-                    Array.isArray(window.CHICKEN_ZIP_IMPORTED_GAMES) ? window.CHICKEN_ZIP_IMPORTED_GAMES : []
-                ];
-
-                for (const source of extraSources) {
-                    for (const item of source) {
-                        const key = normalizeName(item.name);
-                        if (!seen.has(key)) {
-                            seen.add(key);
-                            merged.push(item);
-                        }
                     }
                 }
 
